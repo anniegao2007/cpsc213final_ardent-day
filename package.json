@@ -1,0 +1,39 @@
+{
+  "name": "social-todo-express",
+  "version": "1.0.0",
+  "description": "my assignment for class",
+  "main": "index.js",
+  "engines": {
+    "node": "8.9.4"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon -e js,json,html,handlebars  ./index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yale-cpsc-213-spring-2018/social-todo-anniegao2007"
+  },
+  "author": "",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://github.com/kljensen/cpsc113-social-todo-node/issues"
+  },
+  "homepage": "https://github.com/kljensen/cpsc113-social-todo-node#readme",
+  "dependencies": {
+    "bcrypt": "^1.0.3",
+    "body-parser": "^1.18.2",
+    "connect-mongodb-session": "^1.4.0",
+    "express": "^4.16.2",
+    "express-handlebars": "^3.0.0",
+    "express-session": "^1.15.6",
+    "mongoose": "^5.0.9",
+    "validator": "^9.4.1"
+  },
+  "devDependencies": {
+    "eslint": "^4.17.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.2.0",
+    "nodemon": "^1.17.1"
+  }
+}

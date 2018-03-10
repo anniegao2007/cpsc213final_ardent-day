@@ -1,0 +1,82 @@
+<h1>CPSC213 Final Project</h1>
+{{#if errors}}
+<div>
+<ul style="color:red" class="errors">
+  {{#each errors}}
+    <li>{{this}}</li>
+  {{/each}} </ul>
+</div>
+{{/if}}
+
+{{#if currentUser}}
+    <h2 class="welcome">Welcome, {{currentUser.name}}</h2>
+    <h3>Your Classes</h3>
+    <div>
+        <table class="classes">
+            <thead>
+                <th>Class Name</th>
+                <th>Instructors</th>
+            </thead>
+            {{#if classes}}
+                {{#each classes}}
+                    <td>
+                        <a href="/class/rubrics" class="rubrics">{{name}}</a>
+                    </td>
+                    <td>
+                        {{#each instructors}}
+                            {{this}} <br>
+                        {{/each}}
+                    </td>
+                {{/each}}
+            {{else}}
+                No classes yet!
+            {{/if}}
+        </table>
+    </div>
+    <hr>
+    <div>
+        <h4>Register New Class: </h4>
+        <form action="/class/create" method="POST" class="createClass">
+            Class Name:
+            <input type="text" name="className"> <br>
+            Other Instructors' Emails:
+            <input type="email" name="newInstructor"> <br>
+            <!-- FIGURE OUT HOW TO ADD MORE -->
+            <input type="submit" value="Add Class!" class="create-class-submit">
+        </form>
+    </div>
+
+    <footer>
+        <a href="/user/logout" class="logout">Logout</a>
+    </footer>
+
+{{else}}
+
+<div>
+  <form action="/user/login" method="POST" class="login">
+    Email: <input type="text" name="email" required>
+    Password: <input type="password" name="password" required>
+    <input type="submit" value="Login">
+  </form>
+</div>
+
+<div><hr></div>
+
+<div>
+<h3>
+    Register New User
+</h3>
+<form action="/user/register" method="POST" class="register">
+    Name: <br>
+    <input type="text" name="name" class="text-input"> <br> <br>
+    Email: <br>
+    <input type="text" name="email" class="text-input"> <br> <br>
+    Password: <br>
+    <input type="password" name="password" class="text-input"> <br> <br>
+    Confirm Password: <br>
+    <input type="password" name="passwordConfirmation" class="text-input"> <br> <br>
+    <input type="submit" value="Register!" class="submit">
+</form>
+</div>
+
+{{/if}}
