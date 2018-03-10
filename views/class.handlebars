@@ -1,0 +1,52 @@
+<h1>CPSC213 Final Project</h1>
+{{#if errors}}
+<div>
+<ul style="color:red" class="errors">
+    {{#each errors}}
+        <li>{{this}}</li>
+    {{/each}} </ul>
+</div>
+{{/if}}
+
+<h2>{{resultClass.name}}</h2>
+
+<h3>Rubrics</h3>
+
+<div>
+    <table id="rubrics">
+        <thead>
+            <th>Assignment Date</th>
+            <th>Assignment Name</th>
+        </thead>
+        {{#if rubrics}}
+            {{#each rubrics}}
+                <tr class="rubric">
+                    <td>{{assignmentDate}}</td>
+                    <td>
+                        <a href="rubric/{{_id}}/sections" class="sections">{{assignmentTitle}}</a>
+                    </td>
+                    <td>
+                        <form action="/rubric/{{_id}}/edit" method="GET">
+                            <input type="submit" value="Edit">
+                        </form>
+                    </td>
+                </tr>
+            {{/each}}
+        {{else}}
+            No rubrics yet!
+        {{/if}}
+    </table>
+</div>
+<hr>
+    <form action="/rubric/{{resultClass._id}}/create" method="POST">
+        Assignment Date: <input type="date" name="date"> <br>
+        Assignment Name: <input type="text" name="title">
+        <input type="submit" value="Add">
+    </form>
+<hr>
+<footer>
+        <form action="/" method="GET">
+            <input type="submit" value="Back to Classes">
+        </form>
+        <a href="/user/logout" class="logout">Logout</a>
+</footer>

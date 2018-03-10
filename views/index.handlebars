@@ -12,21 +12,23 @@
     <h2 class="welcome">Welcome, {{currentUser.name}}</h2>
     <h3>Your Classes</h3>
     <div>
-        <table class="classes">
+        <table id="classes">
             <thead>
                 <th>Class Name</th>
                 <th>Instructors</th>
             </thead>
             {{#if classes}}
                 {{#each classes}}
-                    <td>
-                        <a href="/class/rubrics" class="rubrics">{{name}}</a>
-                    </td>
-                    <td>
-                        {{#each instructors}}
-                            {{this}} <br>
-                        {{/each}}
-                    </td>
+                    <tr class="class">
+                        <td>
+                            <a href="/class/{{_id}}/rubrics" class="rubrics">{{name}}</a>
+                        </td>
+                        <td>
+                            {{#each instructors}}
+                                {{this}} <br>
+                            {{/each}}
+                        </td>
+                    </tr>
                 {{/each}}
             {{else}}
                 No classes yet!
@@ -45,7 +47,7 @@
             <input type="submit" value="Add Class!" class="create-class-submit">
         </form>
     </div>
-
+    <hr>
     <footer>
         <a href="/user/logout" class="logout">Logout</a>
     </footer>

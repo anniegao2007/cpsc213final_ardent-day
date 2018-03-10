@@ -189,20 +189,71 @@ app.post('/class/create', (req, res) => {
             errors.push('Invalid instructor email.');
         }
     }
+
+    Classes.findOne({ name: className }, (err1, result) => {
+        if (result) {
+            errors.push('Class already exists.');
+        }
+        if (errors.length === 0) {
+            Users.findOne({ _id: req.session.userId }, (err, user) => {
+                const newClass = new Classes({
+                    instructors: [user.email, newInstructor],
+                    name: className,
+                });
+                newClass.save(() => {
+                    console.log(`Saved ${newClass}`);
+                    res.redirect('/');
+                });
+            });
+        } else {
+            res.redirect('/');
+        }
+    });
+});
+
+// Load all rubrics in a class
+app.get('/class/:id/rubrics', (req, res) => {
+    const id = req.params.id;
+    Classes.findOne({ _id: id }, (err, resultClass) => {
+        Rubrics.find({ classId: id }, (err1, rubrics) => {
+            res.render('class', { resultClass, rubrics, errors });
+        });
+    });
+});
+
+// Create new rubric
+app.post('/rubric/:classId/create', (req, res) => {
+    const date = req.body.date;
+    const title = req.body.title;
+    const classId = req.params.classId;
+
+    if (title.length < 1 || title.length > 50) {
+        errors.push('Assignment name must be between 1-50 characters.');
+    }
     if (errors.length === 0) {
-        Users.findOne({ _id: req.session.userId }, (err, user) => {
-            const newClass = new Classes({
-                instructors: [user.email, newInstructor],
-                name: className,
-            });
-            newClass.save(() => {
-                console.log(`Saved ${newClass}`);
-                res.redirect('/');
-            });
+        const newRubric = new Rubrics({
+            classId,
+            assignmentDate: date,
+            assignmentTitle: title,
+        });
+        console.log(title);
+        newRubric.save(() => {
+            console.log(`Saved ${newRubric}`);
+            res.redirect(`/class/${classId}/rubrics`);
         });
     } else {
-        res.redirect('/');
+        res.redirect(`/class/${classId}/rubrics`);
     }
+});
+
+// Add actual items into rubric: item, optional description, point value
+app.get('/rubric/:rubricid/edit', (req, res) => {
+
+});
+
+// List sections of that class
+app.get('/rubric/:rubricid/sections', (req, res) => {
+
 });
 
 // Start the server
