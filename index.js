@@ -14,6 +14,7 @@ const Users = require('./models/users.js');
 const Classes = require('./models/classes.js');
 const Students = require('./models/students.js');
 const Rubrics = require('./models/rubrics.js');
+const Sections = require('./models/sections.js');
 
 const store = new MongoDBStore({
     uri: process.env.MONGO_URL,
@@ -199,6 +200,7 @@ app.post('/class/create', (req, res) => {
                 const newClass = new Classes({
                     instructors: [user.email, newInstructor],
                     name: className,
+                    // sectionIds: [],
                 });
                 newClass.save(() => {
                     console.log(`Saved ${newClass}`);
@@ -211,12 +213,57 @@ app.post('/class/create', (req, res) => {
     });
 });
 
+// Load all sections in a class
+app.get('/class/:id/sections', (req, res) => {
+    const id = req.params.id;
+    Classes.findOne({ _id: id }, (err, resultClass) => {
+        Sections.find({ classId: id }, (err1, sections) => {
+            res.render('sections', { resultClass, sections, errors });
+            errors = [];
+        });
+    });
+});
+
+//create section
+app.post('/section/:id/create', (req, res) => {
+    const classId = req.params.id;
+    const sectionName = req.body.name;
+    const instructorEmail = req.body.instructor;
+
+    Users.findOne({ email: instructorEmail }, (err, user) => {
+        if(user) {
+            const newSection = new Sections({
+                instructor: user.name,
+                name: sectionName,
+                students: [],
+                classId: classId,
+            });
+            newSection.save();
+        } else {
+            errors.push("Instructor not registered in database.");
+        }
+        res.redirect(`/class/${classId}/sections`);
+    })
+});
+
+// Delete section
+app.post('/section/:classId/:id/delete', (req, res) => {
+    const sectionId = req.params.id;
+    const classId = req.params.classId;
+    Sections.findOne({ _id: sectionId }, (err, resultClass) => {
+        Sections.remove(resultClass, () => {
+            res.redirect(`/class/${classId}/sections`);
+        });
+    });
+});
+
 // Load all rubrics in a class
 app.get('/class/:id/rubrics', (req, res) => {
     const id = req.params.id;
     Classes.findOne({ _id: id }, (err, resultClass) => {
         Rubrics.find({ classId: id }, (err1, rubrics) => {
             res.render('class', { resultClass, rubrics, errors });
+            errors = [];
         });
     });
 });
@@ -248,11 +295,6 @@ app.post('/rubric/:classId/create', (req, res) => {
 
 // Add actual items into rubric: item, optional description, point value
 app.get('/rubric/:rubricid/edit', (req, res) => {
-
-});
-
-// List sections of that class
-app.get('/rubric/:rubricid/sections', (req, res) => {
 
 });
 

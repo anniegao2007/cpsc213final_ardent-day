@@ -11,6 +11,7 @@ const stringField = {
 const ClassSchema = new Schema({
     instructors: [String],
     name: stringField,
+    // sectionIds: [Number],
     //consider where to put rubrics, sections 
 });
 
