@@ -258,11 +258,12 @@ app.post('/section/:classId/:id/delete', (req, res) => {
 });
 
 // Load all rubrics in a class
-app.get('/class/:id/rubrics', (req, res) => {
-    const id = req.params.id;
-    Classes.findOne({ _id: id }, (err, resultClass) => {
-        Rubrics.find({ classId: id }, (err1, rubrics) => {
-            res.render('class', { resultClass, rubrics, errors });
+app.get('/class/:classId/section/:sectId/rubrics', (req, res) => {
+    const sectionId = req.params.sectId;
+    const classId = req.params.classId;
+    Classes.findOne({ _id: classId }, (err, resultClass) => {
+        Rubrics.find({ sectionIds: sectionId }, (err1, rubrics) => {
+            res.render('rubric', errors, resultClass, rubrics);
             errors = [];
         });
     });
