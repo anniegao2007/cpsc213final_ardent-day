@@ -7,6 +7,7 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const mongoose = require('mongoose');
 const validator = require('validator');
+const handlebarsintl = require('handlebars-intl');
 const app = express();
 mongoose.connect(process.env.MONGO_URL);
 

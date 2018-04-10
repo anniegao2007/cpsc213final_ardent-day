@@ -2,9 +2,15 @@ head {
     display: none;
 }
 
+* {
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
 body {
     display: block;
     margin: 8px;
+    padding-top: 20px;
+    padding-left: 30px;
 }
 
 div {
@@ -55,7 +61,13 @@ h4 {
     font-weight: bold;
 }
 
+input {
+    padding: 4px 7px;
+    
+}
+
 footer {
+
     display: block;
 }
 
