@@ -257,6 +257,11 @@ app.post('/section/:classId/:id/delete', (req, res) => {
     });
 });
 
+
+
+//Things stop working after here
+
+
 // Load all rubrics in a class
 app.get('/class/:classId/section/:sectId/rubrics', (req, res) => {
     const sectionId = req.params.sectId;
