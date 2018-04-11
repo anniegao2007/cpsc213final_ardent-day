@@ -120,3 +120,11 @@ a:-webkit-any-link {
     background-size: 1470px 810px;
     height: 700px;
 }
+
+.text-input{
+    height:30px;
+}
+
+.register{
+    font-size: 100px;
+}
