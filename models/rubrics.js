@@ -6,17 +6,21 @@ const stringField = {
     minlength: 1,
     maxlength: 100,
 };
+var Field = new Schema({
+    title: String,
+    pointsEarned: Number,
+    pointsPossible: Number,
+});
 
 const RubricSchema = new Schema({
-    sectionIds: [String],
+    isMaster: Boolean,
+    classId: String,
+    sectionId: [String],
+    studentId: String,
     assignmentDate: Date,
     assignmentTitle: stringField,
-    
-    /*
-    //list of these
-    item: stringField,
-    description: stringField,
-    points: [Number], */
+    fields: [Field],
+    comments: stringField,
 });
 
 module.exports = mongoose.model('Rubrics', RubricSchema);

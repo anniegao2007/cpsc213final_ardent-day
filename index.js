@@ -259,50 +259,81 @@ app.post('/section/:classId/:id/delete', (req, res) => {
 });
 
 
-
-//Things stop working after here
-
+var fieldArray = ["yo"];
 
 // Load all rubrics in a class
 app.get('/class/:classId/section/:sectId/rubrics', (req, res) => {
-    const sectionId = req.params.sectId;
+    const sectId = req.params.sectId;
     const classId = req.params.classId;
     Classes.findOne({ _id: classId }, (err, resultClass) => {
-        Rubrics.find({ sectionIds: sectionId }, (err1, rubrics) => {
-            res.render('rubric', errors, resultClass, rubrics);
-            errors = [];
+        Sections.findOne({ _id: sectId }, (err, resultSection) => {
+            Rubrics.find({sectionId: {$elemMatch: {$eq: sectId}}}, (err1, rubrics) => {
+                res.render('rubric', {errors, resultClass, resultSection, rubrics, fields: fieldArray});
+                errors = [];
+            });
         });
     });
 });
 
 // Create new rubric
-app.post('/rubric/:classId/create', (req, res) => {
+app.post('/class/:classId/section/:sectId/rubrics/create', (req, res) => {
     const date = req.body.date;
     const title = req.body.title;
     const classId = req.params.classId;
+    const sectId = req.params.sectId;
+    const fieldNames = req.body.fieldNames;
+    const fieldValues = req.body.fieldValues;
 
     if (title.length < 1 || title.length > 50) {
         errors.push('Assignment name must be between 1-50 characters.');
     }
     if (errors.length === 0) {
         const newRubric = new Rubrics({
-            classId,
+            classId: classId,
             assignmentDate: date,
             assignmentTitle: title,
+            isMaster: true,
         });
-        console.log(title);
+        newRubric.sectionId.push(sectId);
+        for(var i = 0; i < fieldArray.length; i++){
+            newRubric.fields.push({title: fieldNames[i], pointsPossible: fieldValues[i]})
+        }
         newRubric.save(() => {
-            console.log(`Saved ${newRubric}`);
-            res.redirect(`/class/${classId}/rubrics`);
+            console.log('Saved ${newRubric}');
+            fieldArray = ["at it again"];
+            res.redirect(`/class/${classId}/section/${sectId}/rubrics`);
         });
     } else {
-        res.redirect(`/class/${classId}/rubrics`);
+        res.redirect(`/class/${classId}/section/${sectId}/rubrics`);
     }
 });
 
-// Add actual items into rubric: item, optional description, point value
-app.get('/rubric/:rubricid/edit', (req, res) => {
+//delete rubric from list
+app.post('/class/:classId/section/:sectId/rubrics/:rubricId/delete', (req, res) => {
+    Rubrics.remove({_id:req.params.rubricId}, function(err){
+        if(err){
+            console.log("Uh oh error deleting rubric");
+        }
+        res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectID + '/rubrics');
+    });
+    
+});
 
+//add a field to rubric
+app.post('/class/:classId/section/:sectId/rubrics/addField', (req, res)=>{
+    fieldArray.push("anotha one");
+    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectID + '/rubrics');
+});
+
+//remove last field from rubric
+app.post('/class/:classId/section/:sectId/rubrics/removeField', (req, res)=>{
+    if(fieldArray.length > 1){
+        fieldArray.pop();
+    }
+    else{
+        errors.push("Cannot Remove Last Remaining Field");
+    }
+    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectID + '/rubrics');
 });
 
 // Start the server
