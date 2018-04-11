@@ -14,11 +14,11 @@
 
 <div>
     <table id="rubrics">
+        {{#if rubrics}}
         <thead>
             <th>Assignment Date</th>
             <th>Assignment Name</th>
         </thead>
-        {{#if rubrics}}
             {{#each rubrics}}
                 <tr class="rubric">
                     <td>{{assignmentDate}}</td>
