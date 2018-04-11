@@ -20,7 +20,7 @@
                 {{#each classes}}
                     <tr class="class">
                         <td>
-                            <a href="/class/{{_id}}/rubrics" class="rubrics">{{name}}</a>
+                            <a href="/class/{{_id}}/sections" class="sections">{{name}}</a>
                         </td>
                         <td>
                             {{#each instructors}}
@@ -47,31 +47,18 @@
         </form>
     </div>
     <hr>
-    <footer>
-        <a href="/user/logout" class="logout">Logout</a>
-    </footer>
 
 {{else}}
 <div class="bgimg">
-    <br><br><br>
-    <h1 style = "font-size: 50px; padding-left:50px; padding-top:100px;"> Make grading fun. </h1>
-    <h3 style = "font-size: 40px; padding-left:50px;"><br> <br> Sign up for our free pilot runs today. </h3>
-</div>
-
-
-<br>
-<h1 style= "text-align:center;font-size:40px;color=#052340;"> Sign up for a free Gradr account:</h1>
-<div>
-<form action="/user/register" method="POST" class="register" style= "text-align:center; font-size:30px;">
-    Name: <br>
-    <input type="text" name="name" class="text-input"> <br> <br>
-    Email: <br>
-    <input type="text" name="email" class="text-input"> <br> <br>
-    Password: <br>
-    <input type="password" name="password" class="text-input"> <br> <br>
-    Confirm Password: <br>
-    <input type="password" name="passwordConfirmation" class="text-input"> <br> <br>
-    <input type="submit" value="Register!" class="submit">
+    <br><br>
+    <h1 style = "font-size: 50px; padding-left:50px; padding-top:60px;"> Grading shouldn't hurt. </h1>
+    <h3 style = "font-size: 40px; padding-left:50px;"><br> Sign up for our free pilot runs today. </h3>
+    <form action="/user/register" method="POST" class="register" style= "padding-left:50px; font-size:30px;">
+    <input type="text" name="name" class="text-input" placeholder="Name"> 
+    <input type="text" name="email" class="text-input" placeholder="Email"> <br> <br>
+    <input type="password" name="password" class="text-input" placeholder="Password"> 
+    <input type="password" name="passwordConfirmation" class="text-input" placeholder="Confirm Password"> <br> <br>
+    <input type="submit" value="Register!" class="register">
 </form>
 </div>
 

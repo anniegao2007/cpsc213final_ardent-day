@@ -8,7 +8,7 @@ const stringField = {
 };
 
 const RubricSchema = new Schema({
-    classId: String,
+    sectionIds: [String],
     assignmentDate: Date,
     assignmentTitle: stringField,
     
