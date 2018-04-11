@@ -8,9 +8,6 @@ head {
 
 body {
     display: block;
-    margin: 8px;
-    padding-top: 20px;
-    padding-left: 30px;
 }
 
 div {
@@ -75,4 +72,51 @@ a:-webkit-any-link {
     color: -webkit-link;
     cursor: pointer;
     text-decoration: underline;
+}
+
+.topnav {
+    overflow: hidden;
+    height: 100px;
+    background: linear-gradient(to bottom right, #094074, #052340);
+}
+
+.topnav a {
+    float: left;
+    color: #ddd;
+    text-align: center;
+    padding: 40px 30px;
+    text-decoration: none;
+    font-size: 17px;
+    height: 100px;
+}
+
+.topnav a:hover {
+    background-color: #ddd;
+    color: black;
+}
+
+.topnav logo {
+    float: left;
+    color: #ddd;
+    text-align: center;
+    padding: 9px 8px;
+    text-decoration: none;
+    font-size: 17px;
+    height: 100px;
+}
+
+.topnav login {
+    float: right;
+    color: #ddd;
+    text-align: left;
+    padding: 20px 20px;
+    text-decoration: none;
+    font-size: 17px;
+    height: 100px;
+}
+
+.bgimg {
+    background-image: url("https://www.apple.com/education/real-stories/images/luminary_2x.jpg");
+    background-size: 1470px 810px;
+    height: 700px;
 }
