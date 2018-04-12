@@ -26,12 +26,12 @@
                     </td>
                     <td>{{instructor}}</td>
                     <td>
-                        <form action="/section/{{_id}}/students" method="GET">
+                        <form action="section/{{_id}}/students" method="GET">
                             <input type="submit" value="Manage Students">
                         </form>
                     </td>
                     <td>
-                        <form action="/section/{{../resultClass._id}}/{{_id}}/delete" method="POST">
+                        <form action="section/{{_id}}/delete" method="POST">
                             <input type="submit" value="Delete">
                         </form>
                     </td>
@@ -43,7 +43,8 @@
     </table>
 </div>
 <hr>
-    <form action="/section/{{resultClass._id}}/create" method="POST">
+    <form action="section/create" method="POST">
+    <h3>Add Section</h3>
         Name: <input type="text" name="name"> <br>
         Instructor Email: <input type="email" name="instructor">
         <input type="submit" value="Add">

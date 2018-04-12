@@ -16,7 +16,7 @@ const Classes = require('./models/classes.js');
 // const Students = require('./models/students.js');
 const Rubrics = require('./models/rubrics.js');
 const Sections = require('./models/sections.js').Sections;
-const Students = require('./models/sections.js').Students;
+const Students = require('./models/students.js').Students;
 
 const store = new MongoDBStore({
     uri: process.env.MONGO_URL,
@@ -216,7 +216,7 @@ app.post('/class/create', (req, res) => {
 });
 
 // Load all sections in a class
-app.get('/class/:id/sections', (req, res) => {
+app.get('/class/:id/section', (req, res) => {
     const id = req.params.id;
     Classes.findOne({ _id: id }, (err, resultClass) => {
         Sections.find({ classId: id }, (err1, sections) => {
@@ -227,7 +227,7 @@ app.get('/class/:id/sections', (req, res) => {
 });
 
 //create section
-app.post('/section/:id/create', (req, res) => {
+app.post('/class/:id/section/create', (req, res) => {
     const classId = req.params.id;
     const sectionName = req.body.name;
     const instructorEmail = req.body.instructor;
@@ -240,27 +240,29 @@ app.post('/section/:id/create', (req, res) => {
                 students: [],
                 classId: classId,
             });
-            newSection.save();
+            newSection.save(() => {
+                res.redirect(`/class/${classId}/section`);
+            });
         } else {
             errors.push("Instructor not registered in database.");
+            res.redirect(`/class/${classId}/section`);
         }
-        res.redirect(`/class/${classId}/sections`);
     })
 });
 
 // Delete section
-app.post('/section/:classId/:id/delete', (req, res) => {
+app.post('/class/:classId/section/:id/delete', (req, res) => {
     const sectionId = req.params.id;
     const classId = req.params.classId;
     Sections.findOne({ _id: sectionId }, (err, resultClass) => {
         Sections.remove(resultClass, () => {
-            res.redirect(`/class/${classId}/sections`);
+            res.redirect(`/class/${classId}/section`);
         });
     });
 });
 
 // List all students in a section
-app.get('/section/:id/students', (req, res) => {
+app.get('/class/:classId/section/:id/students', (req, res) => {
     const sectionId = req.params.id;
     Sections.findOne({ _id: sectionId }, (err, sect) => {
         if(sect) {
@@ -271,7 +273,7 @@ app.get('/section/:id/students', (req, res) => {
 });
 
 // Add student to a section
-app.post('/student/:sectionId/create', (req, res) => {
+app.post('/class/:classId/section/:sectionId/student/create', (req, res) => {
     const sectId = req.params.sectionId;
     const fName = req.body.firstname;
     const lName = req.body.lastname;
@@ -331,7 +333,7 @@ app.get('/student/:studentid/edit', (req, res) => {
 });*/
 
 // Delete a student from a section
-app.post('/student/:studentid/:sectionid/delete', (req, res) => {
+app.post('/class/:classId/section/:sectionid/student/:studentid/delete', (req, res) => {
     const sectId = req.params.sectionid;
     const studentId = req.params.studentid;
     Sections.findOne({ _id: sectId }, (err, sect) => {
