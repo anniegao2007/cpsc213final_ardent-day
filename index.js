@@ -194,9 +194,9 @@ app.post('/class/create', (req, res) => {
     }
 
     Classes.findOne({ name: className }, (err1, result) => {
-        if (result) {
+        /* if (result) {
             errors.push('Class already exists.');
-        }
+        } */ //no restrictions on overlapping class names
         if (errors.length === 0) {
             Users.findOne({ _id: req.session.userId }, (err, user) => {
                 const newClass = new Classes({
@@ -406,7 +406,7 @@ app.post('/class/:classId/section/:sectId/rubrics/:rubricId/delete', (req, res) 
         if(err){
             console.log("Uh oh error deleting rubric");
         }
-        res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectID + '/rubrics');
+        res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubrics');
     });
     
 });
@@ -414,7 +414,7 @@ app.post('/class/:classId/section/:sectId/rubrics/:rubricId/delete', (req, res) 
 //add a field to rubric
 app.post('/class/:classId/section/:sectId/rubrics/addField', (req, res)=>{
     fieldArray.push("anotha one");
-    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectID + '/rubrics');
+    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubrics');
 });
 
 //remove last field from rubric
@@ -425,7 +425,7 @@ app.post('/class/:classId/section/:sectId/rubrics/removeField', (req, res)=>{
     else{
         errors.push("Cannot Remove Last Remaining Field");
     }
-    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectID + '/rubrics');
+    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubrics');
 });
 
 // Start the server
