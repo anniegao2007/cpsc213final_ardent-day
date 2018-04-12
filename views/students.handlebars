@@ -1,0 +1,61 @@
+<h1>CPSC213 Final Project</h1>
+{{#if errors}}
+<div>
+<ul style="color:red" class="errors">
+    {{#each errors}}
+        <li>{{this}}</li>
+    {{/each}} </ul>
+</div>
+{{/if}}
+
+<h2>{{currentSection.name}}</h2>
+
+<h3>Students</h3>
+
+<div>
+    <table id="students">
+        <thead>
+            <th>Last, First</th>
+            <th>ID</th>
+            <th>Email</th>
+        </thead>
+        {{#if students}}
+            {{#each students}}
+                <tr class="students">
+                    <td>
+                        {{lastname}}, {{firstname}}
+                    </td>
+                    <td>{{studentid}}</td>
+                    <td>{{email}}</td>
+                    <td>
+                        <form action="/student/{{studentid}}/edit" method="GET">
+                            <input type="submit" value="Edit">
+                        </form>
+                    </td>
+                    <td>
+                        <form action="/student/{{studentid}}/{{../currentSection._id}}/delete" method="POST">
+                            <input type="submit" value="Delete">
+                        </form>
+                    </td>
+                </tr>
+            {{/each}}
+        {{else}}
+            No Students yet!
+        {{/if}}
+    </table>
+</div>
+<hr>
+    <form action="/student/{{currentSection._id}}/create" method="POST">
+        Name: <input type="text" name="firstname" placeholder="First">
+              <input type="text" name="lastname" placeholder="Last"> <br>
+        Student ID: <input type="text" name="studentid"> <br>
+        Email: <input type="email" name="studentemail">
+        <input type="submit" value="Add">
+    </form>
+<hr>
+<footer>
+        <form action="/" method="GET">
+            <input type="submit" value="Back to Classes">
+        </form>
+        <a href="/user/logout" class="logout">Logout</a>
+</footer>
