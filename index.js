@@ -314,7 +314,7 @@ app.post('/class/:classId/section/:sectId/rubrics/:rubricId/delete', (req, res) 
         if(err){
             console.log("Uh oh error deleting rubric");
         }
-        res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectID + '/rubrics');
+        res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubrics');
     });
     
 });
