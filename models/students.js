@@ -9,15 +9,14 @@ const stringField = {
 };
 
 const StudentSchema = new Schema({
-    firstname: stringField,
-    lastname: stringField,
-    studentid: stringField,
+    studentid: String,
+    firstname: String,
+    lastname: String,
     email: {
         type: String,
         minlength: 1,
         maxlength: 50,
         lowercase: true,
-        unique: true,
     },
 });
 

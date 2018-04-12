@@ -13,9 +13,10 @@ mongoose.connect(process.env.MONGO_URL);
 
 const Users = require('./models/users.js');
 const Classes = require('./models/classes.js');
-const Students = require('./models/students.js');
+// const Students = require('./models/students.js');
 const Rubrics = require('./models/rubrics.js');
-const Sections = require('./models/sections.js');
+const Sections = require('./models/sections.js').Sections;
+const Students = require('./models/sections.js').Students;
 
 const store = new MongoDBStore({
     uri: process.env.MONGO_URL,
@@ -258,6 +259,97 @@ app.post('/section/:classId/:id/delete', (req, res) => {
     });
 });
 
+// List all students in a section
+app.get('/section/:id/students', (req, res) => {
+    const sectionId = req.params.id;
+    Sections.findOne({ _id: sectionId }, (err, sect) => {
+        if(sect) {
+            res.render('students', { currentSection: sect, students: sect.students, errors });
+            errors = [];
+        }
+    });
+});
+
+// Add student to a section
+app.post('/student/:sectionId/create', (req, res) => {
+    const sectId = req.params.sectionId;
+    const fName = req.body.firstname;
+    const lName = req.body.lastname;
+    const id = req.body.studentid;
+    const email = req.body.studentemail;
+    Sections.findOne({ _id: sectId }, (err, sect) => {
+        Students.findOne({ studentid: id }, (err1, stu) => {
+            let index = -1;
+            if(stu) {
+                console.log(sect.students.length);
+                for(var i = 0; i < sect.students.length; i++) {
+                    if(sect.students[i].studentid === stu.studentid) {
+                        index = i;
+                        break;
+                    }
+                }
+            }
+            
+            if(index != -1) {
+                errors.push('Student already exists.');
+                res.redirect(`/section/${sectId}/students`);
+            } else if(fName.length == 0 || lName.length == 0 || email.length == 0) {
+                errors.push('Please fill out all fields.');
+                res.redirect(`/section/${sectId}/students`);
+            } else if (fName.length > 50 || lName.length > 50 || email.length > 50) {
+                errors.push('Input length must be between 1-50 characters.');
+                res.redirect(`/section/${sectId}/students`);
+            } else {
+                const newStudent = new Students({
+                    studentid: id,
+                    firstname: fName,
+                    lastname: lName,
+                    email: email,
+                });
+                newStudent.save();
+                console.log(`Saved ${newStudent}!`);
+                sect.students.push(newStudent);
+                sect.students.sort(function(a, b) { 
+                    if(b.lastname < a.lastname) {
+                        return 1;
+                    } else {
+                        return -1;
+                    }
+                });
+                console.log(sect.students);
+                Sections.update({ _id: sectId }, { $set: { students: sect.students }}, (err2) => {
+                    res.redirect(`/section/${sectId}/students`);
+                });
+            }
+        });
+    });
+});
+/*
+// Edit a student's data
+app.get('/student/:studentid/edit', (req, res) => {
+
+});*/
+
+// Delete a student from a section
+app.post('/student/:studentid/:sectionid/delete', (req, res) => {
+    const sectId = req.params.sectionid;
+    const studentId = req.params.studentid;
+    Sections.findOne({ _id: sectId }, (err, sect) => {
+        Students.findOne({ studentid: studentId }, (err1, student) => {
+            let index = -1;
+            for(var i = 0; i < sect.students.length; i++) {
+                if(sect.students[i].studentid === student.studentid) {
+                    index = i;
+                    break;
+                }
+            }
+            sect.students.splice(index, 1);
+            Sections.update({ _id: sectId }, { $set: { students: sect.students }}, (err2) => {
+                res.redirect(`/section/${sectId}/students`);
+            });
+        });
+    });
+});
 
 var fieldArray = ["yo"];
 
