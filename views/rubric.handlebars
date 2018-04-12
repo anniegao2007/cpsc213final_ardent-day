@@ -47,8 +47,8 @@
             Field Name: <input type="text" name="fieldNames[]"> Max Points: <input type="number" name="fieldValues[]"><br>
         {{/each}}
         <div>
-            <button type="submit" formaction="section/{{resultSection._id}}/rubrics/addField" formmethod="POST">Add Field</button>
-            <button type="submit" formaction="section/{{resultSection._id}}/rubrics/removeField" formmethod="POST">Remove Last Field</button>
+            <button type="submit" formaction="rubrics/addField" formmethod="POST">Add Field</button>
+            <button type="submit" formaction="rubrics/removeField" formmethod="POST">Remove Last Field</button>
         </div>
         <br>
         <br>
