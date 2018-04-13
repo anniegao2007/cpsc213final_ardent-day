@@ -46,7 +46,10 @@
         Assignment Name: <input type="text" name="title"> <br>
         <h3>Configure Rubric:</h3>
         {{#each fields}}
-            Field Name: <input type="text" name="fieldNames[]"> <br>Max Points: <input type="number" name="fieldValues[]"><br>
+            Field Name: <input type="text" name="fieldNames[]"><br>
+            Max Points: <input type="number" name="fieldValues[]"><br>
+            Description: <input type="text" name="fieldDescriptions[]"><br>
+            <br>
         {{/each}}
         <br>
         <div>

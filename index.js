@@ -380,6 +380,7 @@ app.post('/class/:classId/section/:sectId/rubric/create', (req, res) => {
     const sectId = req.params.sectId;
     const fieldNames = req.body.fieldNames;
     const fieldValues = req.body.fieldValues;
+    const fieldDescriptions = req.body.fieldDescriptions;
 
     if (title.length < 1 || title.length > 50) {
         errors.push('Assignment name must be between 1-50 characters.');
@@ -393,7 +394,7 @@ app.post('/class/:classId/section/:sectId/rubric/create', (req, res) => {
         });
         newRubric.sectionId.push(sectId);
         for(var i = 0; i < fieldArray.length; i++){
-            newRubric.fields.push({title: fieldNames[i], pointsPossible: fieldValues[i]})
+            newRubric.fields.push({title: fieldNames[i], pointsPossible: fieldValues[i], desciption: fieldDescriptions[i]});
         }
         newRubric.save(() => {
             console.log('Saved ${newRubric}');
