@@ -7,8 +7,9 @@
 </div>
 {{/if}}
 
-<h2>{{currentSection.name}}</h2>
+<h1>{{currentSection.name}}</h1>
 
+<h2>Students</h2>
 <h3><a href="/">Classes</a> > <a href="/class/{{currentSection.classId}}/section">Sections</a> > Students</h3>
 
 <div>
@@ -43,13 +44,14 @@
         {{/if}}
     </table>
 </div>
+
 <div class = "createMenu">
     <h3>Input Student Information</h3>
     <form action="student/create" method="POST">
-        Name: <input type="text" name="firstname" placeholder="First">
-              <input type="text" name="lastname" placeholder="Last"> <br>
-        Student ID: <input type="text" name="studentid"> <br>
-        Email: <input type="email" name="studentemail"> <br><br>
+        First Name: <input type="text" name="firstname" placeholder="First"> <br>
+        Last Name: <input type="text" name="lastname" placeholder="Last"> <br>
+        Student ID: <input type="text" name="studentid" placeholder="ID"> <br>
+        Email: <br> <input type="email" name="studentemail" placeholder="Email"> <br><br>
         <button type="submit" value="Add Student"> Add Student </button>
         <br><br>
     </form>
