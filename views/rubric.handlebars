@@ -22,10 +22,10 @@
                 <tr class="rubric">
                     <td>{{assignmentDate}}</td>
                     <td>
-                        <a href="rubrics/{{_id}}/fillOut" class="sections">{{assignmentTitle}}</a>
+                        <a href="rubric/{{_id}}/fillOut" class="sections">{{assignmentTitle}}</a>
                     </td>
                     <td>
-                        <form action="rubrics/{{_id}}/delete" method="POST">
+                        <form action="rubric/{{_id}}/delete" method="POST">
                             <input type="submit" value="Delete">
                         </form>
                     </td>
@@ -38,7 +38,7 @@
 </div>
 <hr>
     <h3>Create Assignment:</h3>
-    <form action="rubrics/create" method="POST">
+    <form action="rubric/create" method="POST">
         Assignment Date: <input type="date" name="date"> <br>
         Assignment Name: <input type="text" name="title"> <br>
         <h4>Configure Rubric:</h4>
@@ -46,8 +46,8 @@
             Field Name: <input type="text" name="fieldNames[]"> Max Points: <input type="number" name="fieldValues[]"><br>
         {{/each}}
         <div>
-            <button type="submit" formaction="rubrics/addField" formmethod="POST">Add Field</button>
-            <button type="submit" formaction="rubrics/removeField" formmethod="POST">Remove Last Field</button>
+            <button type="submit" formaction="rubric/addField" formmethod="POST">Add Field</button>
+            <button type="submit" formaction="rubric/removeField" formmethod="POST">Remove Last Field</button>
         </div>
         <br>
         <br>
@@ -55,8 +55,8 @@
     </form>
 <hr>
 <footer>
-        <form action="/" method="GET">
-            <input type="submit" value="Back to Classes">
+        <form action="/class/{{resultClass._id}}/section" method="GET">
+            <input type="submit" value="Back to Sections">
         </form>
         <a href="/user/logout" class="logout">Logout</a>
 </footer>

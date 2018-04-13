@@ -13,10 +13,9 @@ mongoose.connect(process.env.MONGO_URL);
 
 const Users = require('./models/users.js');
 const Classes = require('./models/classes.js');
-// const Students = require('./models/students.js');
 const Rubrics = require('./models/rubrics.js');
-const Sections = require('./models/sections.js').Sections;
-const Students = require('./models/sections.js').Students;
+const Sections = require('./models/sections.js');
+const Students = require('./models/students.js');
 
 const store = new MongoDBStore({
     uri: process.env.MONGO_URL,
@@ -216,7 +215,7 @@ app.post('/class/create', (req, res) => {
 });
 
 // Load all sections in a class
-app.get('/class/:id/sections', (req, res) => {
+app.get('/class/:id/section', (req, res) => {
     const id = req.params.id;
     Classes.findOne({ _id: id }, (err, resultClass) => {
         Sections.find({ classId: id }, (err1, sections) => {
@@ -227,7 +226,7 @@ app.get('/class/:id/sections', (req, res) => {
 });
 
 //create section
-app.post('/section/:id/create', (req, res) => {
+app.post('/class/:id/section/create', (req, res) => {
     const classId = req.params.id;
     const sectionName = req.body.name;
     const instructorEmail = req.body.instructor;
@@ -237,124 +236,115 @@ app.post('/section/:id/create', (req, res) => {
             const newSection = new Sections({
                 instructor: user.name,
                 name: sectionName,
-                students: [],
                 classId: classId,
             });
-            newSection.save();
+            newSection.save(() => {
+                res.redirect(`/class/${classId}/section`);
+            });
         } else {
             errors.push("Instructor not registered in database.");
+            res.redirect(`/class/${classId}/section`);
         }
-        res.redirect(`/class/${classId}/sections`);
     })
 });
 
 // Delete section
-app.post('/section/:classId/:id/delete', (req, res) => {
+app.post('/class/:classId/section/:id/delete', (req, res) => {
     const sectionId = req.params.id;
     const classId = req.params.classId;
     Sections.findOne({ _id: sectionId }, (err, resultClass) => {
         Sections.remove(resultClass, () => {
-            res.redirect(`/class/${classId}/sections`);
+            res.redirect(`/class/${classId}/section`);
         });
     });
 });
 
 // List all students in a section
-app.get('/section/:id/students', (req, res) => {
+app.get('/class/:classId/section/:id/student', (req, res) => {
     const sectionId = req.params.id;
     Sections.findOne({ _id: sectionId }, (err, sect) => {
         if(sect) {
-            res.render('students', { currentSection: sect, students: sect.students, errors });
-            errors = [];
+            Students.find({sections: {$elemMatch: {$eq: sectionId}}}).collation({locale: "en", strength: 2}).sort({lastname: 1, firstname: 1}).exec(function (err, kids) {
+                res.render('students', { classId: req.params.classId, currentSection: sect, students: kids, errors });
+                errors = [];
+            });
         }
     });
 });
 
 // Add student to a section
-app.post('/student/:sectionId/create', (req, res) => {
+app.post('/class/:classId/section/:sectionId/student/create', (req, res) => {
     const sectId = req.params.sectionId;
+    const cId = req.params.classId;
     const fName = req.body.firstname;
     const lName = req.body.lastname;
     const id = req.body.studentid;
     const email = req.body.studentemail;
-    Sections.findOne({ _id: sectId }, (err, sect) => {
-        Students.findOne({ studentid: id }, (err1, stu) => {
-            let index = -1;
-            if(stu) {
-                console.log(sect.students.length);
-                for(var i = 0; i < sect.students.length; i++) {
-                    if(sect.students[i].studentid === stu.studentid) {
-                        index = i;
-                        break;
-                    }
-                }
-            }
-            
-            if(index != -1) {
+    Students.findOne({ studentid: id }, (err1, stu) => {
+        if(stu) {
+            if(stu.sections.indexOf(sectId) != -1){
                 errors.push('Student already exists.');
-                res.redirect(`/section/${sectId}/students`);
-            } else if(fName.length == 0 || lName.length == 0 || email.length == 0) {
-                errors.push('Please fill out all fields.');
-                res.redirect(`/section/${sectId}/students`);
-            } else if (fName.length > 50 || lName.length > 50 || email.length > 50) {
-                errors.push('Input length must be between 1-50 characters.');
-                res.redirect(`/section/${sectId}/students`);
-            } else {
-                const newStudent = new Students({
-                    studentid: id,
-                    firstname: fName,
-                    lastname: lName,
-                    email: email,
-                });
-                newStudent.save();
-                console.log(`Saved ${newStudent}!`);
-                sect.students.push(newStudent);
-                sect.students.sort(function(a, b) { 
-                    if(b.lastname < a.lastname) {
-                        return 1;
-                    } else {
-                        return -1;
-                    }
-                });
-                console.log(sect.students);
-                Sections.update({ _id: sectId }, { $set: { students: sect.students }}, (err2) => {
-                    res.redirect(`/section/${sectId}/students`);
+                res.redirect(`/class/${cId}/section/${sectId}/student`);
+            }
+            else{
+                stu.sections.push(sectId);
+                Students.update({studentid: id}, {$set: {sections: stu.sections}}, ()=>{
+                    res.redirect(`/class/${cId}/section/${sectId}/student`);
                 });
             }
-        });
+        } else if(fName.length == 0 || lName.length == 0 || email.length == 0) {
+            errors.push('Please fill out all fields.');
+            res.redirect(`/class/${cId}/section/${sectId}/student`);
+        } else if (fName.length > 50 || lName.length > 50 || email.length > 50) {
+            errors.push('Input length must be between 1-50 characters.');
+            res.redirect(`/class/${cId}/section/${sectId}/student`);
+        } else {
+            const newStudent = new Students({
+                studentid: id,
+                firstname: fName,
+                lastname: lName,
+                email: email,
+            });
+            newStudent.sections.push(sectId);
+            newStudent.save();
+            console.log(`Saved ${newStudent}!`);
+            res.redirect(`/class/${cId}/section/${sectId}/student`);
+        }
     });
 });
 /*
 // Edit a student's data
-app.get('/student/:studentid/edit', (req, res) => {
+app.get('/class/:classId/section/:sectionId/student/:studentId/edit', (req, res) => {
 
 });*/
 
 // Delete a student from a section
-app.post('/student/:studentid/:sectionid/delete', (req, res) => {
-    const sectId = req.params.sectionid;
-    const studentId = req.params.studentid;
-    Sections.findOne({ _id: sectId }, (err, sect) => {
-        Students.findOne({ studentid: studentId }, (err1, student) => {
-            let index = -1;
-            for(var i = 0; i < sect.students.length; i++) {
-                if(sect.students[i].studentid === student.studentid) {
-                    index = i;
-                    break;
-                }
-            }
-            sect.students.splice(index, 1);
-            Sections.update({ _id: sectId }, { $set: { students: sect.students }}, (err2) => {
-                res.redirect(`/section/${sectId}/students`);
+app.post('/class/:classId/section/:sectionId/student/:studentId/delete', (req, res) => {
+    const sectId = req.params.sectionId;
+    const cId = req.params.classId;
+    const studentId = req.params.studentId;
+    Students.findOne({ studentid: studentId }, (err1, student) => {
+        var i = student.sections.indexOf(sectId);
+        if(i > -1){
+            student.sections.splice(i, 1);
+        }
+        if(student.sections.length === 0){
+            Students.remove({studentid: studentId}, () => {
+                res.redirect(`/class/${cId}/section/${sectId}/student`);
             });
-        });
+        }
+        else{
+            Students.update({studentid: studentId}, {$set: {sections: student.sections}}, () => {
+                res.redirect(`/class/${cId}/section/${sectId}/student`);
+            });
+        }
     });
 });
 
 var fieldArray = ["yo"];
 
 // Load all rubrics in a class
-app.get('/class/:classId/section/:sectId/rubrics', (req, res) => {
+app.get('/class/:classId/section/:sectId/rubric', (req, res) => {
     const sectId = req.params.sectId;
     const classId = req.params.classId;
     Classes.findOne({ _id: classId }, (err, resultClass) => {
@@ -368,7 +358,7 @@ app.get('/class/:classId/section/:sectId/rubrics', (req, res) => {
 });
 
 // Create new rubric
-app.post('/class/:classId/section/:sectId/rubrics/create', (req, res) => {
+app.post('/class/:classId/section/:sectId/rubric/create', (req, res) => {
     const date = req.body.date;
     const title = req.body.title;
     const classId = req.params.classId;
@@ -393,39 +383,39 @@ app.post('/class/:classId/section/:sectId/rubrics/create', (req, res) => {
         newRubric.save(() => {
             console.log('Saved ${newRubric}');
             fieldArray = ["at it again"];
-            res.redirect(`/class/${classId}/section/${sectId}/rubrics`);
+            res.redirect(`/class/${classId}/section/${sectId}/rubric`);
         });
     } else {
-        res.redirect(`/class/${classId}/section/${sectId}/rubrics`);
+        res.redirect(`/class/${classId}/section/${sectId}/rubric`);
     }
 });
 
 //delete rubric from list
-app.post('/class/:classId/section/:sectId/rubrics/:rubricId/delete', (req, res) => {
+app.post('/class/:classId/section/:sectId/rubric/:rubricId/delete', (req, res) => {
     Rubrics.remove({_id:req.params.rubricId}, function(err){
         if(err){
             console.log("Uh oh error deleting rubric");
         }
-        res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubrics');
+        res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubric');
     });
     
 });
 
 //add a field to rubric
-app.post('/class/:classId/section/:sectId/rubrics/addField', (req, res)=>{
+app.post('/class/:classId/section/:sectId/rubric/addField', (req, res)=>{
     fieldArray.push("anotha one");
-    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubrics');
+    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubric');
 });
 
 //remove last field from rubric
-app.post('/class/:classId/section/:sectId/rubrics/removeField', (req, res)=>{
+app.post('/class/:classId/section/:sectId/rubric/removeField', (req, res)=>{
     if(fieldArray.length > 1){
         fieldArray.pop();
     }
     else{
         errors.push("Cannot Remove Last Remaining Field");
     }
-    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubrics');
+    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubric');
 });
 
 // Start the server
