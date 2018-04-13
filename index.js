@@ -260,7 +260,7 @@ app.post('/class/:classId/section/:id/delete', (req, res) => {
 });
 
 // List all students in a section
-app.get('/class/:classId/section/:id/student', async (req, res) => {
+app.get('/class/:classId/section/:id/student', (req, res) => {
     const sectionId = req.params.id;
     Sections.findOne({ _id: sectionId }, (err, sect) => {
         if(sect) {
