@@ -394,10 +394,10 @@ app.post('/class/:classId/section/:sectId/rubric/create', (req, res) => {
         });
         newRubric.sectionId.push(sectId);
         for(var i = 0; i < fieldArray.length; i++){
-            newRubric.fields.push({title: fieldNames[i], pointsPossible: fieldValues[i], desciption: fieldDescriptions[i]});
+            newRubric.fields.push({title: fieldNames[i], pointsPossible: fieldValues[i], description: fieldDescriptions[i]});
         }
         newRubric.save(() => {
-            console.log('Saved ${newRubric}');
+            console.log(`Saved ${newRubric}`);
             fieldArray = ["at it again"];
             res.redirect(`/class/${classId}/section/${sectId}/rubric`);
         });
