@@ -14,19 +14,19 @@
 
 <div>
     <table id="sections">
+        {{#if sections}}
         <thead>
             <th>Name</th>
             <th>Instructor</th>
         </thead>
-        {{#if sections}}
             {{#each sections}}
                 <tr class="sections">
                     <td>
-                        <a href="section/{{this._id}}/rubrics" class="sections">{{name}}</a>
+                        <a href="section/{{this._id}}/rubric" class="sections">{{name}}</a>
                     </td>
                     <td>{{instructor}}</td>
                     <td>
-                        <form action="section/{{_id}}/students" method="GET">
+                        <form action="section/{{_id}}/student" method="GET">
                             <input type="submit" value="Manage Students">
                         </form>
                     </td>

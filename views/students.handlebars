@@ -14,12 +14,12 @@
 
 <div>
     <table id="students">
+        {{#if students}}
         <thead>
             <th>Last, First</th>
             <th>ID</th>
             <th>Email</th>
         </thead>
-        {{#if students}}
             {{#each students}}
                 <tr class="students">
                     <td>
@@ -28,12 +28,12 @@
                     <td>{{studentid}}</td>
                     <td>{{email}}</td>
                     <td>
-                        <form action="/student/{{studentid}}/edit" method="GET">
+                        <form action="student/{{studentid}}/edit" method="GET">
                             <input type="submit" value="Edit">
                         </form>
                     </td>
                     <td>
-                        <form action="/student/{{studentid}}/{{../currentSection._id}}/delete" method="POST">
+                        <form action="student/{{studentid}}/delete" method="POST">
                             <input type="submit" value="Delete">
                         </form>
                     </td>
@@ -51,12 +51,12 @@
               <input type="text" name="lastname" placeholder="Last"> <br>
         Student ID: <input type="text" name="studentid"> <br>
         Email: <input type="email" name="studentemail">
-        <input type="submit" value="Add">
+        <input type="submit" value="Add Student">
     </form>
 <hr>
 <footer>
-        <form action="/" method="GET">
-            <input type="submit" value="Back to Classes">
+        <form action="/class/{{classId}}/section" method="GET">
+            <input type="submit" value="Back to Sections">
         </form>
         <a href="/user/logout" class="logout">Logout</a>
 </footer>
