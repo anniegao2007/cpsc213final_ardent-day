@@ -9,7 +9,11 @@
 
 <h1>{{resultClass.name}}</h1>
 
+<<<<<<< HEAD
 <h2>Rubrics</h2>
+=======
+<h3><a href="/">Classes</a> > <a href="/class/{{resultClass._id}}/section">Sections</a> > Rubrics</h3>
+>>>>>>> 618e2e9524e771ee1a56e49dee557aae6742b7ff
 
 <div>
     <table id="rubrics">
@@ -17,6 +21,7 @@
         <thead>
             <th>Assignment Date</th>
             <th>Assignment Name</th>
+            <th> </th>
         </thead>
             {{#each rubrics}}
                 <tr class="rubric">
@@ -36,27 +41,22 @@
         {{/if}}
     </table>
 </div>
-<hr>
-    <h3>Create Assignment:</h3>
+<br><br>
+<div class ="createMenu">
+    <h2>Create Assignment</h2>
     <form action="rubric/create" method="POST">
         Assignment Date: <input type="date" name="date"> <br>
         Assignment Name: <input type="text" name="title"> <br>
-        <h4>Configure Rubric:</h4>
+        <h3>Configure Rubric:</h3>
         {{#each fields}}
-            Field Name: <input type="text" name="fieldNames[]"> Max Points: <input type="number" name="fieldValues[]"><br>
+            Field Name: <input type="text" name="fieldNames[]"> <br>Max Points: <input type="number" name="fieldValues[]"><br>
         {{/each}}
+        <br>
         <div>
             <button type="submit" formaction="rubric/addField" formmethod="POST">Add Field</button>
             <button type="submit" formaction="rubric/removeField" formmethod="POST">Remove Last Field</button>
         </div>
         <br>
-        <br>
-        <input type="submit" value="Add Assignment">
+        <button type="submit" value="Add Assignment">Add Assignment</button>
     </form>
-<hr>
-<footer>
-        <form action="/class/{{resultClass._id}}/section" method="GET">
-            <input type="submit" value="Back to Sections">
-        </form>
-        <a href="/user/logout" class="logout">Logout</a>
-</footer>
+</div>

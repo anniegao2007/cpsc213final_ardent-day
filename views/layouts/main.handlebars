@@ -13,6 +13,7 @@
 
         {{#if currentUser}}
         <a href="/user/logout" class="logot" style = "text-align: right;">Logout</a>
+        <a style="float: right; background-color: #1F487E; color: white;">Welcome, {{currentUser.name}}!</a>
         {{/if}}
         {{#unless currentUser}}
         <login> Already Registered?

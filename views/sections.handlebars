@@ -9,7 +9,11 @@
 
 <h1>{{resultClass.name}}</h1>
 
+<<<<<<< HEAD
 <h2>Sections</h2>
+=======
+<h3><a href = "/">Classes</a> > Sections</h3>
+>>>>>>> 618e2e9524e771ee1a56e49dee557aae6742b7ff
 
 <div>
     <table id="sections">
@@ -17,6 +21,8 @@
         <thead>
             <th>Name</th>
             <th>Instructor</th>
+            <th> </th>
+                <th> </th>
         </thead>
             {{#each sections}}
                 <tr class="sections">
@@ -41,17 +47,14 @@
         {{/if}}
     </table>
 </div>
-<hr>
+<br>
+<div class = "createMenu">
     <form action="section/create" method="POST">
     <h3>Add Section</h3>
         Name: <input type="text" name="name"> <br>
         Instructor Email: <input type="email" name="instructor">
-        <input type="submit" value="Add">
+        <br><br>
+        <button type="submit" value="Add"> Add </button>
     </form>
-<hr>
-<footer>
-        <form action="/" method="GET">
-            <input type="submit" value="Back to Classes">
-        </form>
-        <a href="/user/logout" class="logout">Logout</a>
-</footer>
+    <br>
+</div>
