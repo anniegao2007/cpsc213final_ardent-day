@@ -8,8 +8,7 @@
 {{/if}}
 
 {{#if currentUser}}
-    <h2 class="welcome">Welcome, {{currentUser.name}}!</h2>
-    <h3>Classes</h3>
+    <h2>Classes</h2>
     <div>
         <table id="classes">
             <thead>
@@ -34,19 +33,22 @@
             {{/if}}
         </table>
     </div>
-    <hr>
-    <div>
-        <h4>Register New Class: </h4>
+    <br>
+    <div class ="createMenu">
+        <h2>Register New Class: </h2>
         <form action="/class/create" method="POST" class="createClass">
             Class Name:
             <input type="text" name="className"> <br>
             Other Instructors' Emails:
             <input type="email" name="newInstructor"> <br>
             <!-- FIGURE OUT HOW TO ADD MORE -->
-            <input type="submit" value="Add Class!" class="create-class-submit">
+            <br>
+            <button type="submit" value="Add Class!" class="create-class-submit"> Add Class!</button>
+            <br>
+            <br>
         </form>
     </div>
-    <hr>
+    
 
 {{else}}
 <div class="bgimg">
