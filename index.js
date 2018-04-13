@@ -268,11 +268,6 @@ app.get('/class/:classId/section/:id/student', async (req, res) => {
                 res.render('students', { classId: req.params.classId, currentSection: sect, students: kids, errors });
                 errors = [];
             });
-            /*Students.find({sections: {$elemMatch: {$eq: sectionId}}}, (err, stdnts) => {
-                stdnts = stdnts.sort({lastname: -1});
-                res.render('students', { classId: req.params.classId, currentSection: sect, students: stdnts, errors });
-                errors = [];
-            });*/
         }
     });
 });
