@@ -2,12 +2,6 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const stringField = {
-    type: String,
-    minlength: 1,
-    maxlength: 500.
-};
-
 const StudentSchema = new Schema({
     studentid: String,
     firstname: String,
@@ -18,6 +12,8 @@ const StudentSchema = new Schema({
         maxlength: 50,
         lowercase: true,
     },
+    sections: [String],
+    classes: [String],
 });
 
-module.exports = mongoose.model('Student', StudentSchema);
+module.exports = mongoose.model('Students', StudentSchema);
