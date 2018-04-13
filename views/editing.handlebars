@@ -1,0 +1,25 @@
+{{#if errors}}
+<div>
+<ul style="color:red" class="errors">
+    {{#each errors}}
+        <li>{{this}}</li>
+    {{/each}} </ul>
+</div>
+{{/if}}
+
+{{#if student}}
+<div>
+    <h1>Edit Student Information</h1>
+    <form action="edit" method="POST">
+        Name: <input type="text" name="firstname" value={{student.firstname}}>
+              <input type="text" name="lastname" value={{student.lastname}}> <br>
+        Student ID: <input type="text" name="studentid" value={{student.studentid}}> <br>
+        Email: <input type="email" name="studentemail" value={{student.email}}> <br><br>
+        <button type="submit" value="update"> Update </button>
+        <br><br>
+    </form>
+    <form action="/class/{{classID}}/section/{{sectionID}}/student" method="GET">
+            <button type="submit" value="cancel"> Cancel </button>
+    </form>
+</div>
+{{/if}}

@@ -312,11 +312,26 @@ app.post('/class/:classId/section/:sectionId/student/create', (req, res) => {
         }
     });
 });
-/*
+
 // Edit a student's data
 app.get('/class/:classId/section/:sectionId/student/:studentId/edit', (req, res) => {
+    const id = req.params.studentId;
+    Students.findOne({ studentid: id }, (err, stu) => {
+        res.render('editing', { student: stu, classID: req.params.classId, sectionID: req.params.sectionId });
+    });
+});
 
-});*/
+// Update edits
+app.post('/class/:classId/section/:sectionId/student/:studentId/edit', (req, res) => {
+    const fName = req.body.firstname;
+    const lName = req.body.lastname;
+    const id = req.body.studentid;
+    const email = req.body.studentemail;
+
+    Students.update({ studentid: req.params.studentId }, { $set: { firstname: fName, lastname: lName, studentid: id, email: email }}, () => {
+        res.redirect(`/class/${req.params.classId}/section/${req.params.sectionId}/student`);
+    });
+});
 
 // Delete a student from a section
 app.post('/class/:classId/section/:sectionId/student/:studentId/delete', (req, res) => {
