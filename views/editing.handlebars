@@ -55,16 +55,17 @@
 {{#if rubric}}
 <div>
     <h1>Edit Rubric</h1>
-    <form>
+    <form action="edit" method="POST">
         Assignment Date: <input type="date" name="date" value={{rubric.assignmentDate}}> <br>
         Assignment Title: <input type="text" name="title" value={{rubric.assignmentTitle}}> <br>
         {{#each rubric.fields}}
-            Field Name: <input type="text" name="fieldName" value={{title}}> <br>
+            Field Name: <input type="text" name="fieldName{{@index}}" value={{title}}> <br>
             <BLOCKQUOTE>
-                Field Description: <input type="text" name="fieldDesc" value={{description}}> <br>
-                Points Possible: <input type="number" name="fieldPts" value={{pointsPossible}}> <br>
+                Field Description: <input type="text" name="fieldDesc{{@index}}" value={{description}}> <br>
+                Points Possible: <input type="number" name="fieldPts{{@index}}" value={{pointsPossible}}> <br>
             </BLOCKQUOTE> <br>
         {{/each}}
+        <button type="submit" value="update"> Update </button>
     </form>
     <form action="/class/{{classID}}/section/{{sectionID}}/rubric" method="GET">
             <button type="submit" value="cancel"> Cancel </button>

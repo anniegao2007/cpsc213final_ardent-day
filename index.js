@@ -484,9 +484,16 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => {
 });
 
 // Update edits
-/*app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => {
+app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => {
+    const date = req.body.date;
+    const title = req.body.title;
+    
+    // UPDATE FIELDS WITH req.body.fieldTitle{{@index}}
 
-}); */
+    Rubrics.update({ _id: req.params.rubricId }, { $set: { assignmentDate: date, assignmentTitle: title, /*fields*/ }}, () => {
+        res.redirect(`/class/${req.params.classId}/section/${req.params.sectionId}/rubric`);
+    });
+});
 
 // Start the server
 const port = process.env.PORT || 3500;
