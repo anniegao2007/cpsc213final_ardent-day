@@ -27,6 +27,11 @@
                         <a href="rubric/{{_id}}/fillOut" class="sections">{{assignmentTitle}}</a>
                     </td>
                     <td>
+                        <form action="rubric/{{_id}}/edit" method="GET">
+                            <input type="submit" value="Edit">
+                        </form>
+                    </td>
+                    <td>
                         <form action="rubric/{{_id}}/delete" method="POST">
                             <input type="submit" value="Delete">
                         </form>
