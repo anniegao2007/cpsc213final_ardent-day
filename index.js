@@ -500,7 +500,6 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut', (req, res) 
             points[i] = 0;
         }
     }
-    console.log(points, studId);
     Rubrics.findOne({_id: RID}, (err, rubric) => {
         var newRubric = new Rubrics({
             classId: CID,
