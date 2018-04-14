@@ -405,7 +405,7 @@ app.get('/class/:classId/section/:sectId/rubric', (req, res) => {
     const classId = req.params.classId;
     Classes.findOne({ _id: classId }, (err, resultClass) => {
         Sections.findOne({ _id: sectId }, (err, resultSection) => {
-            Rubrics.find({sectionId: {$elemMatch: {$eq: sectId}}}, (err1, rubrics) => {
+            Rubrics.find({sectionId: {$elemMatch: {$eq: sectId}}, isMaster: true}, (err1, rubrics) => {
                 res.render('rubric', {errors, resultClass, resultSection, rubrics, fields: fieldArray});
                 errors = [];
             });
@@ -473,6 +473,56 @@ app.post('/class/:classId/section/:sectId/rubric/removeField', (req, res)=>{
         errors.push("Cannot Remove Last Remaining Field");
     }
     res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubric');
+});
+
+//fill out rubric
+app.get('/class/:classId/section/:sectId/rubric/:rubricId/fillOut', (req, res) => {
+    var CID = req.params.classId;
+    var SID = req.params.sectId;
+    var RID = req.params.rubricId;
+    Rubrics.findOne({_id: RID}, (err, rubric) => {
+        Students.find({sections: {$elemMatch: {$eq: SID}}}).collation({locale: "en", strength: 2}).sort({lastname: 1, firstname: 1}).exec(function (err, students) {
+            res.render('fillOut', {rubric, students, classId: CID, sectionId: SID, rubricId: RID});
+        });
+    });
+});
+
+//submit filled out rubric
+app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut', (req, res) => {
+    var CID = req.params.classId;
+    var SID = req.params.sectId;
+    var RID = req.params.rubricId;
+    var points = req.body.pointsEarned;
+    var studId = req.body.student;
+    var cmnts = req.body.comments;
+    for(var i = 0; i < points.length; i++){
+        if(points[i] === ""){
+            points[i] = 0;
+        }
+    }
+    console.log(points, studId);
+    Rubrics.findOne({_id: RID}, (err, rubric) => {
+        var newRubric = new Rubrics({
+            classId: CID,
+            studentId: studId,
+            comments: cmnts,
+            assignmentDate: rubric.assignmentDate,
+            assignmentTitle: rubric.assignmentTitle,
+            isMaster: false,
+        });
+        newRubric.sectionId.push(SID);
+        for(var i = 0; i < rubric.fields.length; i++){
+            newRubric.fields.push({title: rubric.fields[i].title,
+                pointsPossible: rubric.fields[i].pointsPossible,
+                pointsEarned: points[i],
+                description: rubric.fields[i].description,
+            });
+        }
+        newRubric.save(() => {
+            console.log(`Saved ${newRubric}`);
+            res.redirect(`/class/${CID}/section/${SID}/rubric/${RID}/fillOut`);
+        });
+    });
 });
 
 // Edit rubric
