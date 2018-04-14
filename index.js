@@ -179,16 +179,18 @@ app.use(isLoggedIn);
 // new page for adding students and stuff
 app.post('/class/create', (req, res) => {
     const className = req.body.className;
-    const newInstructor = req.body.newInstructor;
-
+    let instructors = req.body.instructors.trim().split(',');
     const regex = /.+@.+\..+/;
 
     if (className.length < 1 || className.length > 50) {
         errors.push('Class name must be between 1-50 characters.');
     }
-    if (newInstructor.length !== 0) {
-        if (!regex.test(newInstructor)) {
-            errors.push('Invalid instructor email.');
+    if (instructors.length > 0) {
+        for(var i = 0; i < instructors.length; i++) {
+            if (!regex.test(instructors[i])) {
+                errors.push('At least one instructor email is invalid.');
+                break;
+            }
         }
     }
 
@@ -198,8 +200,9 @@ app.post('/class/create', (req, res) => {
         } */ //no restrictions on overlapping class names
         if (errors.length === 0) {
             Users.findOne({ _id: req.session.userId }, (err, user) => {
+                instructors.push(user.email);
                 const newClass = new Classes({
-                    instructors: [user.email, newInstructor],
+                    instructors: instructors,
                     name: className,
                     // sectionIds: [],
                 });
@@ -211,6 +214,24 @@ app.post('/class/create', (req, res) => {
         } else {
             res.redirect('/');
         }
+    });
+});
+
+// Edit class information
+app.get('/class/:id/edit', (req, res) => {
+    const classId = req.params.id;
+    Classes.findOne({ _id: classId }, (err, c) => {
+        res.render('editing', { class: c });
+    });
+});
+
+// Update edits
+app.post('/class/:id/edit', (req, res) => {
+    const newName = req.body.classname;
+    const instructors = req.body.instructors.trim().split(',');
+    console.log(instructors);
+    Classes.update({ _id: req.params.id }, { $set: { name: newName, instructors }}, () => {
+        res.redirect('/');
     });
 });
 
@@ -256,6 +277,26 @@ app.post('/class/:classId/section/:id/delete', (req, res) => {
         Sections.remove(resultClass, () => {
             res.redirect(`/class/${classId}/section`);
         });
+    });
+});
+
+// Edit section
+app.get('/class/:classId/section/:sectId/edit', (req, res) => {
+    const classId = req.params.classId;
+    const sectId = req.params.sectId;
+    Sections.findOne({ _id: sectId }, (err, sect) => {
+        res.render('editing', { section: sect, classID: classId });
+    });
+});
+
+// Update edits
+app.post('/class/:classId/section/:sectId/edit', (req, res) => {
+    const classId = req.params.classId;
+    const sectId = req.params.sectId;
+    const newName = req.body.sName;
+    const inst = req.body.instructor;
+    Sections.update({ _id: sectId }, { $set: { name: newName, instructor: inst }}, () => {
+        res.redirect(`/class/${classId}/section`);
     });
 });
 
@@ -432,6 +473,26 @@ app.post('/class/:classId/section/:sectId/rubric/removeField', (req, res)=>{
         errors.push("Cannot Remove Last Remaining Field");
     }
     res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubric');
+});
+
+// Edit rubric
+app.get('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => {
+    const id = req.params.rubricId;
+    Rubrics.findOne({ _id: id }, (err, rubric) => {
+        res.render('editing', { rubric, classID: req.params.classId, sectionID: req.params.sectId });
+    });
+});
+
+// Update edits
+app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => {
+    const date = req.body.date;
+    const title = req.body.title;
+    
+    // UPDATE FIELDS WITH req.body.fieldTitle{{@index}}
+
+    Rubrics.update({ _id: req.params.rubricId }, { $set: { assignmentDate: date, assignmentTitle: title, /*fields*/ }}, () => {
+        res.redirect(`/class/${req.params.classId}/section/${req.params.sectionId}/rubric`);
+    });
 });
 
 // Start the server

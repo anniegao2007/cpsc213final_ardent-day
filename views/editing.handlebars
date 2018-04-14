@@ -23,3 +23,52 @@
     </form>
 </div>
 {{/if}}
+
+{{#if class}}
+<div>
+    <h1>Edit Class Information</h1>
+    <form action="edit" method="POST">
+        Class Name: <input type="text" name="classname" value={{class.name}}> <br>
+        Other Instructors: <input type="text" name="instructors" value={{class.instructors}}> <br>
+        <button type="submit" value="update"> Update </button>
+    </form>
+    <form action="/" method="GET">
+            <button type="submit" value="cancel"> Cancel </button>
+    </form>
+</div>
+{{/if}}
+
+{{#if section}}
+<div>
+    <h1>Edit Section Information</h1>
+    <form action="edit" method="POST">
+        Section Name: <input type="text" name="sName" value={{section.name}}> <br>
+        Instructor: <input type="text" name="instructor" value={{section.instructor}}> <br>
+        <button type="submit" value="update"> Update </button>
+    </form>
+    <form action="/class/{{classID}}/section" method="GET">
+            <button type="submit" value="cancel"> Cancel </button>
+    </form>
+</div>
+{{/if}}
+
+{{#if rubric}}
+<div>
+    <h1>Edit Rubric</h1>
+    <form action="edit" method="POST">
+        Assignment Date: <input type="date" name="date" value={{rubric.assignmentDate}}> <br>
+        Assignment Title: <input type="text" name="title" value={{rubric.assignmentTitle}}> <br>
+        {{#each rubric.fields}}
+            Field Name: <input type="text" name="fieldName{{@index}}" value={{title}}> <br>
+            <BLOCKQUOTE>
+                Field Description: <input type="text" name="fieldDesc{{@index}}" value={{description}}> <br>
+                Points Possible: <input type="number" name="fieldPts{{@index}}" value={{pointsPossible}}> <br>
+            </BLOCKQUOTE> <br>
+        {{/each}}
+        <button type="submit" value="update"> Update </button>
+    </form>
+    <form action="/class/{{classID}}/section/{{sectionID}}/rubric" method="GET">
+            <button type="submit" value="cancel"> Cancel </button>
+    </form>
+</div>
+{{/if}}
