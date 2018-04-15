@@ -10,7 +10,8 @@ const stringField = {
 
 
 const SectionSchema = new Schema({
-    instructor: stringField, //id of teacher
+    instructor: stringField, //name of teacher
+    instructorId: String, //_id of instructor
     name: stringField,
     classId: String, //id of parent class
 });

@@ -256,6 +256,7 @@ app.post('/class/:id/section/create', (req, res) => {
         if(user) {
             const newSection = new Sections({
                 instructor: user.name,
+                instructorId: user._id,
                 name: sectionName,
                 classId: classId,
             });
@@ -285,7 +286,9 @@ app.get('/class/:classId/section/:sectId/edit', (req, res) => {
     const classId = req.params.classId;
     const sectId = req.params.sectId;
     Sections.findOne({ _id: sectId }, (err, sect) => {
-        res.render('editing', { section: sect, classID: classId });
+        Users.findOne({ _id: sect.instructorId }, (err, user) => {
+            res.render('editing', { section: sect, classID: classId, instructorEmail: user.email});
+        });
     });
 });
 
