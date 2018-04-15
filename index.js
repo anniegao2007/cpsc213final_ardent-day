@@ -536,11 +536,25 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => {
 app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => {
     const date = req.body.date;
     const title = req.body.title;
-    
-    // UPDATE FIELDS WITH req.body.fieldTitle{{@index}}
+    const fieldNames = req.body.fieldName;
+    const fieldDescs = req.body.fieldDesc;
+    const fieldPts = req.body.fieldPts;
 
-    Rubrics.update({ _id: req.params.rubricId }, { $set: { assignmentDate: date, assignmentTitle: title, /*fields*/ }}, () => {
-        res.redirect(`/class/${req.params.classId}/section/${req.params.sectionId}/rubric`);
+    Rubrics.findOne({ _id: req.params.rubricId }, (err, rubric) => {
+        for(var i = 0; i < fieldNames.length; i++) {
+            if(fieldNames[i]) {
+                rubric.fields[i].title = fieldNames[i];
+            }
+            if(fieldDescs[i]) {
+                rubric.fields[i].description = fieldDescs[i];
+            }
+            if(fieldPts[i]) {
+                rubric.fields[i].pointsPossible = fieldPts[i];
+            }
+        }
+        Rubrics.update({ _id: req.params.rubricId }, { $set: { assignmentDate: date, assignmentTitle: title, fields: rubric.fields }}, () => {
+            res.redirect(`/class/${req.params.classId}/section/${req.params.sectId}/rubric`);
+        });
     });
 });
 
