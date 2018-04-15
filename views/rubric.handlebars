@@ -23,8 +23,11 @@
             {{#each rubrics}}
                 <tr class="rubric">
                     <td>{{assignmentDate}}</td>
+                    <td>{{assignmentTitle}}</td>
                     <td>
-                        <a href="rubric/{{_id}}/fillOut" class="sections">{{assignmentTitle}}</a>
+                        <form action="rubric/{{_id}}/fillOut" method="GET">
+                            <input type="submit" value="Grade">
+                        </form>
                     </td>
                     <td>
                         <form action="rubric/{{_id}}/edit" method="GET">
