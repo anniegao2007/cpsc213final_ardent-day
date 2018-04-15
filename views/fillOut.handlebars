@@ -33,4 +33,9 @@
     </form>
 {{else}}
     Add students to this section in order to grade assignments
+    <br>
+    <br>
+    <form method="GET" action="/class/{{classId}}/section/{{sectionId}}/student">
+        <input type="submit" value="Manage Students">
+    </form>
 {{/if}}

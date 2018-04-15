@@ -47,13 +47,13 @@
 <div class ="createMenu">
     <h2>Create Assignment</h2>
     <form action="rubric/create" method="POST">
-        Assignment Date: <input type="date" name="date"> <br>
-        Assignment Name: <input type="text" name="title"> <br>
+        Assignment Date: <input type="date" name="date" value="{{date}}"> <br>
+        Assignment Name: <input type="text" name="title" value="{{title}}"> <br>
         <h3>Configure Rubric:</h3>
-        {{#each fields}}
-            Field Name: <input type="text" name="fieldNames[]"><br>
-            Max Points: <input type="number" name="fieldValues[]"><br>
-            Description: <input type="text" name="fieldDescriptions[]"><br>
+        {{#each data}}
+            Field Name: <input type="text" name="fieldNames[]" value="{{title}}"><br>
+            Max Points: <input type="number" name="fieldValues[]" value="{{pointsPossible}}"><br>
+            Description: <input type="text" name="fieldDescriptions[]" value="{{description}}"><br>
             <br>
         {{/each}}
         <br>
