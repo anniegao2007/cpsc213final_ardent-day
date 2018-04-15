@@ -397,16 +397,18 @@ app.post('/class/:classId/section/:sectionId/student/:studentId/delete', (req, r
     });
 });
 
-var fieldArray = ["yo"];
+var fieldData = [""];
 
 // Load all rubrics in a class
 app.get('/class/:classId/section/:sectId/rubric', (req, res) => {
+    const assignmentDate = req.query.date;
+    const assignmentTitle = req.query.title;
     const sectId = req.params.sectId;
     const classId = req.params.classId;
     Classes.findOne({ _id: classId }, (err, resultClass) => {
         Sections.findOne({ _id: sectId }, (err, resultSection) => {
             Rubrics.find({sectionId: {$elemMatch: {$eq: sectId}}, isMaster: true}, (err1, rubrics) => {
-                res.render('rubric', {errors, resultClass, resultSection, rubrics, fields: fieldArray});
+                res.render('rubric', {errors, resultClass, resultSection, rubrics, date: assignmentDate, title: assignmentTitle, data: fieldData});
                 errors = [];
             });
         });
@@ -422,7 +424,15 @@ app.post('/class/:classId/section/:sectId/rubric/create', (req, res) => {
     const fieldNames = req.body.fieldNames;
     const fieldValues = req.body.fieldValues;
     const fieldDescriptions = req.body.fieldDescriptions;
-
+    for(var i  = 0; i < fieldData.length; i++){
+        if(fieldNames[i] === "" || fieldValues[i] === ""){
+            errors.push("Please fill out all Field Names and Max Points");
+            break;
+        }
+    }
+    if(date === "" || title === ""){
+        errors.push("Please fill out Assignment Date and Name");
+    }
     if (title.length < 1 || title.length > 50) {
         errors.push('Assignment name must be between 1-50 characters.');
     }
@@ -434,16 +444,20 @@ app.post('/class/:classId/section/:sectId/rubric/create', (req, res) => {
             isMaster: true,
         });
         newRubric.sectionId.push(sectId);
-        for(var i = 0; i < fieldArray.length; i++){
+        for(var i = 0; i < fieldData.length; i++){
             newRubric.fields.push({title: fieldNames[i], pointsPossible: fieldValues[i], description: fieldDescriptions[i]});
         }
         newRubric.save(() => {
             console.log(`Saved ${newRubric}`);
-            fieldArray = ["at it again"];
+            fieldData = [""];
             res.redirect(`/class/${classId}/section/${sectId}/rubric`);
         });
     } else {
-        res.redirect(`/class/${classId}/section/${sectId}/rubric`);
+        fieldData = [];
+        for(var i = 0; i < fieldNames.length; i++){
+            fieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i]});
+        }
+        res.redirect("/class/"+classId+"/section/"+sectId+"/rubric?date="+date+"&title="+title);
     }
 });
 
@@ -460,19 +474,37 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/delete', (req, res) =
 
 //add a field to rubric
 app.post('/class/:classId/section/:sectId/rubric/addField', (req, res)=>{
-    fieldArray.push("anotha one");
-    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubric');
+    const date = req.body.date;
+    const title = req.body.title;
+    const fieldNames = req.body.fieldNames;
+    const fieldValues = req.body.fieldValues;
+    const fieldDescriptions = req.body.fieldDescriptions;
+    fieldData = [];
+    for(var i = 0; i < fieldNames.length; i++){
+        fieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i]});
+    }
+    fieldData.push("");
+    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubric?date='+date+'&title='+title);
 });
 
 //remove last field from rubric
 app.post('/class/:classId/section/:sectId/rubric/removeField', (req, res)=>{
-    if(fieldArray.length > 1){
-        fieldArray.pop();
+    const date = req.body.date;
+    const title = req.body.title;
+    const fieldNames = req.body.fieldNames;
+    const fieldValues = req.body.fieldValues;
+    const fieldDescriptions = req.body.fieldDescriptions;
+    fieldData = [];
+    for(var i = 0; i < fieldNames.length; i++){
+        fieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i]});
+    }
+    if(fieldData.length > 1){
+        fieldData.pop();
     }
     else{
-        errors.push("Cannot Remove Last Remaining Field");
+        errors.push("Cannot remove last remaining field");
     }
-    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubric');
+    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubric?date='+date+'&title='+title);
 });
 
 //fill out rubric
