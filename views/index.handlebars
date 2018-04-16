@@ -27,6 +27,11 @@
                                 {{this}} <br>
                             {{/each}}
                         </td>
+                        <td>
+                            <form action="class/{{_id}}/edit" method="GET">
+                                <input type="submit" value="Edit">
+                            </form>
+                        </td>
                     </tr>
                 {{/each}}
             {{else}}
@@ -41,7 +46,7 @@
             Class Name:
             <input type="text" name="className"> <br>
             Other Instructors' Emails:
-            <input type="email" name="newInstructor"> <br>
+            <input type="text" name="instructors"> <br>
             <!-- FIGURE OUT HOW TO ADD MORE -->
             <br>
             <button type="submit" value="Add Class!" class="create-class-submit"> Add Class!</button>

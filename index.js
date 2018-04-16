@@ -179,16 +179,18 @@ app.use(isLoggedIn);
 // new page for adding students and stuff
 app.post('/class/create', (req, res) => {
     const className = req.body.className;
-    const newInstructor = req.body.newInstructor;
-
+    let instructors = req.body.instructors.trim().split(',');
     const regex = /.+@.+\..+/;
 
     if (className.length < 1 || className.length > 50) {
         errors.push('Class name must be between 1-50 characters.');
     }
-    if (newInstructor.length !== 0) {
-        if (!regex.test(newInstructor)) {
-            errors.push('Invalid instructor email.');
+    if (instructors.length > 0) {
+        for(var i = 0; i < instructors.length; i++) {
+            if (!regex.test(instructors[i])) {
+                errors.push('At least one instructor email is invalid.');
+                break;
+            }
         }
     }
 
@@ -198,8 +200,9 @@ app.post('/class/create', (req, res) => {
         } */ //no restrictions on overlapping class names
         if (errors.length === 0) {
             Users.findOne({ _id: req.session.userId }, (err, user) => {
+                instructors.push(user.email);
                 const newClass = new Classes({
-                    instructors: [user.email, newInstructor],
+                    instructors: instructors,
                     name: className,
                     // sectionIds: [],
                 });
@@ -211,6 +214,24 @@ app.post('/class/create', (req, res) => {
         } else {
             res.redirect('/');
         }
+    });
+});
+
+// Edit class information
+app.get('/class/:id/edit', (req, res) => {
+    const classId = req.params.id;
+    Classes.findOne({ _id: classId }, (err, c) => {
+        res.render('editing', { class: c });
+    });
+});
+
+// Update edits
+app.post('/class/:id/edit', (req, res) => {
+    const newName = req.body.classname;
+    const instructors = req.body.instructors.trim().split(',');
+    console.log(instructors);
+    Classes.update({ _id: req.params.id }, { $set: { name: newName, instructors }}, () => {
+        res.redirect('/');
     });
 });
 
@@ -235,6 +256,7 @@ app.post('/class/:id/section/create', (req, res) => {
         if(user) {
             const newSection = new Sections({
                 instructor: user.name,
+                instructorId: user._id,
                 name: sectionName,
                 classId: classId,
             });
@@ -256,6 +278,28 @@ app.post('/class/:classId/section/:id/delete', (req, res) => {
         Sections.remove(resultClass, () => {
             res.redirect(`/class/${classId}/section`);
         });
+    });
+});
+
+// Edit section
+app.get('/class/:classId/section/:sectId/edit', (req, res) => {
+    const classId = req.params.classId;
+    const sectId = req.params.sectId;
+    Sections.findOne({ _id: sectId }, (err, sect) => {
+        Users.findOne({ _id: sect.instructorId }, (err, user) => {
+            res.render('editing', { section: sect, classID: classId, instructorEmail: user.email});
+        });
+    });
+});
+
+// Update edits
+app.post('/class/:classId/section/:sectId/edit', (req, res) => {
+    const classId = req.params.classId;
+    const sectId = req.params.sectId;
+    const newName = req.body.sName;
+    const inst = req.body.instructor;
+    Sections.update({ _id: sectId }, { $set: { name: newName, instructor: inst }}, () => {
+        res.redirect(`/class/${classId}/section`);
     });
 });
 
@@ -312,11 +356,26 @@ app.post('/class/:classId/section/:sectionId/student/create', (req, res) => {
         }
     });
 });
-/*
+
 // Edit a student's data
 app.get('/class/:classId/section/:sectionId/student/:studentId/edit', (req, res) => {
+    const id = req.params.studentId;
+    Students.findOne({ studentid: id }, (err, stu) => {
+        res.render('editing', { student: stu, classID: req.params.classId, sectionID: req.params.sectionId });
+    });
+});
 
-});*/
+// Update edits
+app.post('/class/:classId/section/:sectionId/student/:studentId/edit', (req, res) => {
+    const fName = req.body.firstname;
+    const lName = req.body.lastname;
+    const id = req.body.studentid;
+    const email = req.body.studentemail;
+
+    Students.update({ studentid: req.params.studentId }, { $set: { firstname: fName, lastname: lName, studentid: id, email: email }}, () => {
+        res.redirect(`/class/${req.params.classId}/section/${req.params.sectionId}/student`);
+    });
+});
 
 // Delete a student from a section
 app.post('/class/:classId/section/:sectionId/student/:studentId/delete', (req, res) => {
@@ -341,16 +400,18 @@ app.post('/class/:classId/section/:sectionId/student/:studentId/delete', (req, r
     });
 });
 
-var fieldArray = ["yo"];
+var fieldData = [""];
 
 // Load all rubrics in a class
 app.get('/class/:classId/section/:sectId/rubric', (req, res) => {
+    const assignmentDate = req.query.date;
+    const assignmentTitle = req.query.title;
     const sectId = req.params.sectId;
     const classId = req.params.classId;
     Classes.findOne({ _id: classId }, (err, resultClass) => {
         Sections.findOne({ _id: sectId }, (err, resultSection) => {
-            Rubrics.find({sectionId: {$elemMatch: {$eq: sectId}}}, (err1, rubrics) => {
-                res.render('rubric', {errors, resultClass, resultSection, rubrics, fields: fieldArray});
+            Rubrics.find({sectionId: {$elemMatch: {$eq: sectId}}, isMaster: true}, (err1, rubrics) => {
+                res.render('rubric', {errors, resultClass, resultSection, rubrics, date: assignmentDate, title: assignmentTitle, data: fieldData});
                 errors = [];
             });
         });
@@ -365,7 +426,16 @@ app.post('/class/:classId/section/:sectId/rubric/create', (req, res) => {
     const sectId = req.params.sectId;
     const fieldNames = req.body.fieldNames;
     const fieldValues = req.body.fieldValues;
-
+    const fieldDescriptions = req.body.fieldDescriptions;
+    for(var i  = 0; i < fieldData.length; i++){
+        if(fieldNames[i] === "" || fieldValues[i] === ""){
+            errors.push("Please fill out all Field Names and Max Points");
+            break;
+        }
+    }
+    if(date === "" || title === ""){
+        errors.push("Please fill out Assignment Date and Name");
+    }
     if (title.length < 1 || title.length > 50) {
         errors.push('Assignment name must be between 1-50 characters.');
     }
@@ -377,16 +447,20 @@ app.post('/class/:classId/section/:sectId/rubric/create', (req, res) => {
             isMaster: true,
         });
         newRubric.sectionId.push(sectId);
-        for(var i = 0; i < fieldArray.length; i++){
-            newRubric.fields.push({title: fieldNames[i], pointsPossible: fieldValues[i]})
+        for(var i = 0; i < fieldData.length; i++){
+            newRubric.fields.push({title: fieldNames[i], pointsPossible: fieldValues[i], description: fieldDescriptions[i]});
         }
         newRubric.save(() => {
-            console.log('Saved ${newRubric}');
-            fieldArray = ["at it again"];
+            console.log(`Saved ${newRubric}`);
+            fieldData = [""];
             res.redirect(`/class/${classId}/section/${sectId}/rubric`);
         });
     } else {
-        res.redirect(`/class/${classId}/section/${sectId}/rubric`);
+        fieldData = [];
+        for(var i = 0; i < fieldNames.length; i++){
+            fieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i]});
+        }
+        res.redirect("/class/"+classId+"/section/"+sectId+"/rubric?date="+date+"&title="+title);
     }
 });
 
@@ -403,19 +477,127 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/delete', (req, res) =
 
 //add a field to rubric
 app.post('/class/:classId/section/:sectId/rubric/addField', (req, res)=>{
-    fieldArray.push("anotha one");
-    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubric');
+    const date = req.body.date;
+    const title = req.body.title;
+    const fieldNames = req.body.fieldNames;
+    const fieldValues = req.body.fieldValues;
+    const fieldDescriptions = req.body.fieldDescriptions;
+    fieldData = [];
+    for(var i = 0; i < fieldNames.length; i++){
+        fieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i]});
+    }
+    fieldData.push("");
+    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubric?date='+date+'&title='+title);
 });
 
 //remove last field from rubric
 app.post('/class/:classId/section/:sectId/rubric/removeField', (req, res)=>{
-    if(fieldArray.length > 1){
-        fieldArray.pop();
+    const date = req.body.date;
+    const title = req.body.title;
+    const fieldNames = req.body.fieldNames;
+    const fieldValues = req.body.fieldValues;
+    const fieldDescriptions = req.body.fieldDescriptions;
+    fieldData = [];
+    for(var i = 0; i < fieldNames.length; i++){
+        fieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i]});
+    }
+    if(fieldData.length > 1){
+        fieldData.pop();
     }
     else{
-        errors.push("Cannot Remove Last Remaining Field");
+        errors.push("Cannot remove last remaining field");
     }
-    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubric');
+    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubric?date='+date+'&title='+title);
+});
+
+//fill out rubric
+app.get('/class/:classId/section/:sectId/rubric/:rubricId/fillOut', (req, res) => {
+    var CID = req.params.classId;
+    var SID = req.params.sectId;
+    var RID = req.params.rubricId;
+    Rubrics.findOne({_id: RID}, (err, rubric) => {
+        Students.find({sections: {$elemMatch: {$eq: SID}}}).collation({locale: "en", strength: 2}).sort({lastname: 1, firstname: 1}).exec(function (err, students) {
+            res.render('fillOut', {rubric, students, classId: CID, sectionId: SID, rubricId: RID});
+        });
+    });
+});
+
+//submit filled out rubric
+app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut', (req, res) => {
+    var CID = req.params.classId;
+    var SID = req.params.sectId;
+    var RID = req.params.rubricId;
+    var points = req.body.pointsEarned;
+    var studId = req.body.student;
+    var cmnts = req.body.comments;
+    for(var i = 0; i < points.length; i++){
+        if(points[i] === ""){
+            points[i] = 0;
+        }
+    }
+    Rubrics.findOne({_id: RID}, (err, rubric) => {
+        var newRubric = new Rubrics({
+            classId: CID,
+            studentId: studId,
+            comments: cmnts,
+            assignmentDate: rubric.assignmentDate,
+            assignmentTitle: rubric.assignmentTitle,
+            isMaster: false,
+        });
+        newRubric.sectionId.push(SID);
+        for(var i = 0; i < rubric.fields.length; i++){
+            newRubric.fields.push({title: rubric.fields[i].title,
+                pointsPossible: rubric.fields[i].pointsPossible,
+                pointsEarned: points[i],
+                description: rubric.fields[i].description,
+            });
+        }
+        newRubric.save(() => {
+            console.log(`Saved ${newRubric}`);
+            res.redirect(`/class/${CID}/section/${SID}/rubric/${RID}/fillOut`);
+        });
+    });
+});
+
+// Display list of students with their scores
+app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res) => {
+    Students.find({ sections: req.params.sectId }, (err, students) => {
+        res.render('grades', { students });
+    });
+});
+
+// Edit rubric
+app.get('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => {
+    const id = req.params.rubricId;
+    Rubrics.findOne({ _id: id }, (err, rubric) => {
+        res.render('editing', { rubric, classID: req.params.classId, sectionID: req.params.sectId });
+    });
+});
+
+// Update edits
+app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => {
+    const date = req.body.date;
+    const title = req.body.title;
+    const fieldNames = req.body.fieldName;
+    const fieldDescs = req.body.fieldDesc;
+    const fieldPts = req.body.fieldPts;
+
+    Rubrics.findOne({ _id: req.params.rubricId }, (err, rubric) => {
+        for(var i = 0; i < fieldNames.length; i++) {
+            if(fieldNames[i]) {
+                rubric.fields[i].title = fieldNames[i];
+            }
+            if(fieldDescs[i]) {
+                rubric.fields[i].description = fieldDescs[i];
+            }
+            if(fieldPts[i]) {
+                rubric.fields[i].pointsPossible = fieldPts[i];
+            }
+        }
+        Rubrics.update({ _id: req.params.rubricId }, { $set: { assignmentDate: date, assignmentTitle: title, fields: rubric.fields }}, () => {
+            res.redirect(`/class/${req.params.classId}/section/${req.params.sectId}/rubric`);
+        });
+    });
 });
 
 // Start the server

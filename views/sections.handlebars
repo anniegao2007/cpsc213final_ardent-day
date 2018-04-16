@@ -8,8 +8,9 @@
 </div>
 {{/if}}
 
-<h2>{{resultClass.name}}</h2>
+<h1>{{resultClass.name}}</h1>
 
+<h2>Sections</h2>
 <h3><a href = "/">Classes</a> > Sections</h3>
 
 <div>
@@ -23,13 +24,21 @@
         </thead>
             {{#each sections}}
                 <tr class="sections">
-                    <td>
-                        <a href="section/{{this._id}}/rubric" class="sections">{{name}}</a>
-                    </td>
+                    <td>{{name}}</td>
                     <td>{{instructor}}</td>
                     <td>
                         <form action="section/{{_id}}/student" method="GET">
                             <input type="submit" value="Manage Students">
+                        </form>
+                    </td>
+                    <td>
+                        <form action="section/{{this._id}}/rubric" method="GET">
+                            <input type="submit" value="Manage Assignments">
+                        </form>
+                    </td>
+                    <td>
+                        <form action="section/{{_id}}/edit" method="GET">
+                            <input type="submit" value="Edit">
                         </form>
                     </td>
                     <td>

@@ -8,6 +8,7 @@ const stringField = {
 };
 var Field = new Schema({
     title: String,
+    description: String,
     pointsEarned: Number,
     pointsPossible: Number,
 });

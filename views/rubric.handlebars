@@ -8,8 +8,9 @@
 </div>
 {{/if}}
 
-<h2>{{resultClass.name}}</h2>
+<h1>{{resultClass.name}}</h1>
 
+<h2>Rubrics</h2>
 <h3><a href="/">Classes</a> > <a href="/class/{{resultClass._id}}/section">Sections</a> > Rubrics</h3>
 
 <div>
@@ -23,8 +24,21 @@
             {{#each rubrics}}
                 <tr class="rubric">
                     <td>{{assignmentDate}}</td>
+                    <td>{{assignmentTitle}}</td>
                     <td>
-                        <a href="rubric/{{_id}}/fillOut" class="sections">{{assignmentTitle}}</a>
+                        <form action="rubric/{{_id}}/fillOut" method="GET">
+                            <input type="submit" value="Grade">
+                        </form>
+                    </td>
+                    <td>
+                        <form action="rubric/{{_id}}/viewScores" method="GET">
+                            <input type="submit" value="View Scores">
+                        </form>
+                    </td>
+                    <td>
+                        <form action="rubric/{{_id}}/edit" method="GET">
+                            <input type="submit" value="Edit">
+                        </form>
                     </td>
                     <td>
                         <form action="rubric/{{_id}}/delete" method="POST">
@@ -42,11 +56,14 @@
 <div class ="createMenu">
     <h2>Create Assignment</h2>
     <form action="rubric/create" method="POST">
-        Assignment Date: <input type="date" name="date"> <br>
-        Assignment Name: <input type="text" name="title"> <br>
+        Assignment Date: <input type="date" name="date" value="{{date}}"> <br>
+        Assignment Name: <input type="text" name="title" value="{{title}}"> <br>
         <h3>Configure Rubric:</h3>
-        {{#each fields}}
-            Field Name: <input type="text" name="fieldNames[]"> Max Points: <input type="number" name="fieldValues[]"><br>
+        {{#each data}}
+            Field Name: <input type="text" name="fieldNames[]" value="{{title}}"><br>
+            Max Points: <input type="number" name="fieldValues[]" value="{{pointsPossible}}"><br>
+            Description: <input type="text" name="fieldDescriptions[]" value="{{description}}"><br>
+            <br>
         {{/each}}
         <br>
         <div>
