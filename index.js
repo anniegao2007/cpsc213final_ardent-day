@@ -79,7 +79,7 @@ function isLoggedIn(req, res, next) {
 
 let errors = [];
 
-// home page
+// home page or classes list
 app.get('/', (req, res) => {
     if (req.session.userId) {
         Users.findOne({ _id: req.session.userId }, (err, user) => {
@@ -298,8 +298,10 @@ app.post('/class/:classId/section/:sectId/edit', (req, res) => {
     const sectId = req.params.sectId;
     const newName = req.body.sName;
     const inst = req.body.instructor;
-    Sections.update({ _id: sectId }, { $set: { name: newName, instructor: inst }}, () => {
-        res.redirect(`/class/${classId}/section`);
+    Users.findOne({ email: inst }, (err, usr) => {
+        Sections.update({ _id: sectId }, { $set: { name: newName, instructor: usr.name, instructId: usr._id }}, () => {
+            res.redirect(`/class/${classId}/section`);
+        })
     });
 });
 
