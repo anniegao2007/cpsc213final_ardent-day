@@ -21,7 +21,7 @@ const RubricSchema = new Schema({
     assignmentDate: Date,
     assignmentTitle: stringField,
     fields: [Field],
-    comments: stringField,
+    comments: String,
 });
 
 module.exports = mongoose.model('Rubrics', RubricSchema);
