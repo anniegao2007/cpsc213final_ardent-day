@@ -559,6 +559,13 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut', (req, res) 
     });
 });
 
+// Display list of students with their scores
+app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res) => {
+    Students.find({ sections: req.params.sectId }, (err, students) => {
+        res.render('grades', { students });
+    });
+});
+
 // Edit rubric
 app.get('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => {
     const id = req.params.rubricId;
