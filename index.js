@@ -513,7 +513,7 @@ app.post('/class/:classId/section/:sectId/rubric/removeField', (req, res)=>{
 });
 
 //view rubrics and students
-app.get('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/', (req, res) => {
+app.get('/class/:classId/section/:sectId/rubric/:rubricId/fillOut', (req, res) => {
     var CID = req.params.classId;
     var SID = req.params.sectId;
     var RID = req.params.rubricId;
