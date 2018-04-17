@@ -549,7 +549,6 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
     var points = req.body.pointsEarned;
     var studId = req.params.studentId;
     var cmnts = req.body.comments;
-    console.log("Attempting to submit, comments:", cmnts);
     for(var i = 0; i < points.length; i++){
         if(points[i] === ""){
             points[i] = 0;
