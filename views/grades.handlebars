@@ -1,31 +1,26 @@
 <h1>Grades</h1>
 
-<div style="float: left; text-align: left">
-    <th><h2>Student</h2></th> <br>
-    {{#each students}}
-        <tr class="grades">
-            <td>{{lastname}}, {{firstname}}</td> <br>
-        </tr>
-    {{/each}}
-</div>
-
-<div style="display:inline-block; margin: 0 auto !important; text-align:left;">
-    <th><h2>Total Score [to be implemented]</h2></th>
-    {{#each points}}
-        <td>{{@index}}/{{totalPoints}}</td> 
-    {{/each}}
-</div>
-
-<div style="display:inline-block; margin: 0 auto !important; text-align:left;">
-    <th><h2>Scores for each field [to be implemented]</h2></th>
-    {{#each points}}
-        <td>{{@index}}/{{totalPoints}}</td> 
-    {{/each}}
-</div>
-
-<div style="display:inline-block; margin: 0 auto !important; text-align:left;">
-    <th><h2>Comments [to be implemented]</h2></th>
-    {{#each points}}
-        <td>{{@index}}/{{totalPoints}}</td> 
-    {{/each}}
-</div>
+<table id="grades">
+    <thead>
+        <th>Student</th>
+        <th>Total Score</th>
+        {{#if sketchyFieldsPlaceholder}}
+            {{#each sketchyFieldsPlaceholder}}
+                <th>Field {{index}} Score</th>
+            {{/each}}
+        {{/if}}
+        <th>Additional Comments</th>
+    </thead>
+    {{#if joinStudentsRubrics}}
+        {{#each joinStudentsRubrics}}
+            <tr class="studentData">
+                <td>{{stu.lastname}}, {{stu.firstname}}</td>
+                <td>{{pointsEarnedTotal}} / {{pointsPossible}}</td>
+                {{#each fieldScores}}
+                    <td>{{tmpEarned}}/{{tmpTotal}}</td>
+                {{/each}}
+                <td>{{comments}}</td>
+            </tr>
+        {{/each}}
+    {{/if}}
+    </table>
