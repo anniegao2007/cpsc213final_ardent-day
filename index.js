@@ -615,7 +615,7 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res
                             let fieldScores = [];
                             sketchyFieldsPlaceholder = [];
                             for(var k = 0; k < rubrics[j].fields.length; k++) {
-                                sketchyFieldsPlaceholder.push({index: k+1});
+                                sketchyFieldsPlaceholder.push({name: rubrics[j].fields[k].title});
                                 let tmpTotal = rubrics[j].fields[k].pointsPossible;
                                 let tmpEarned = rubrics[j].fields[k].pointsEarned;
                                 pointsPossible += tmpTotal;
