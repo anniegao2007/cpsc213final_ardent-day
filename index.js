@@ -519,7 +519,7 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/fillOut', (req, res) =
     var RID = req.params.rubricId;
     Rubrics.findOne({_id: RID}, (err, rubric) => {
         Students.find({sections: {$elemMatch: {$eq: SID}}}).collation({locale: "en", strength: 2}).sort({lastname: 1, firstname: 1}).exec(function (err, students) {
-            res.render('fillOut', {rubric, students, classId: CID, sectionId: SID, rubricId: RID, student: null});
+            res.render('fillOut', {rubric, students, classId: CID, sectionId: SID, rubricId: RID});
         });
     });
 });
@@ -533,7 +533,8 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId', (
     Rubrics.findOne({_id: RID}, (err, rubric) => {
         Students.find({sections: {$elemMatch: {$eq: SID}}}).collation({locale: "en", strength: 2}).sort({lastname: 1, firstname: 1}).exec(function (err, students) {
             Students.findOne({_id: stud}, (err, student) => {
-                Rubrics.findOne({studentId: stud}, (err, studentRubric) => {
+                Rubrics.findOne({studentId: stud, masterId: RID}, (err, studentRubric) => {
+                    console.log("found student rubric", studentRubric);
                     res.render('fillOut', {rubric, students, classId: CID, sectionId: SID, rubricId: RID, student, studentRubric});
                 });
             });
@@ -554,16 +555,18 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
             points[i] = 0;
         }
     }
-    Rubrics.findOne({studentId: studId}, (err, studentRubric) => {
+    Rubrics.findOne({studentId: studId, masterId: RID}, (err, studentRubric) => {
         if(studentRubric){
+            console.log("Rubric exists, updating its values");
             for(var i = 0; i < studentRubric.fields.length; i++){
                 studentRubric.fields[i].pointsEarned = points[i];
             }
-            Rubrics.update({studentId: studId}, {$set: {fields: studentRubric.fields, comments: cmnts}}, () => {
+            Rubrics.update({studentId: studId, masterId: RID}, {$set: {fields: studentRubric.fields, comments: cmnts}}, () => {
                 res.redirect(`/class/${CID}/section/${SID}/rubric/${RID}/fillOut`);
             });
         }
         else{
+            console.log("No rubric yet, creating a new one");
             Rubrics.findOne({_id: RID}, (err, rubric) => {
                 var newRubric = new Rubrics({
                     classId: CID,
@@ -572,6 +575,7 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
                     assignmentDate: rubric.assignmentDate,
                     assignmentTitle: rubric.assignmentTitle,
                     isMaster: false,
+                    masterId: RID,
                 });
                 newRubric.sectionId.push(SID);
                 for(var i = 0; i < rubric.fields.length; i++){

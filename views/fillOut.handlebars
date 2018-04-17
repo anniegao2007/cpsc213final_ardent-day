@@ -22,41 +22,38 @@
                     <h3>{{rubric.assignmentTitle}} Rubric</h3>
                     {{#if student}}
                         <h4>{{student.lastname}}, {{student.firstname}}</h4>
-                    {{else}}
-                        <h4>Please Select a Student to Begin Grading</h4>
-                    {{/if}}
-                    {{#if studentRubric}}
-                        {{#each studentRubric.fields}}
+                    
+                        {{#if studentRubric}}
+                            {{#each studentRubric.fields}}
+                                    <h4>{{title}}</h4>
+                                    {{#if description}}
+                                        {{description}}<br>
+                                    {{/if}}
+                                    <input type="number" name="pointsEarned[]" value="{{pointsEarned}}">/{{pointsPossible}}<br>
+                            {{/each}}
+                        {{else}}
+                            {{#each rubric.fields}}
                                 <h4>{{title}}</h4>
                                 {{#if description}}
                                     {{description}}<br>
                                 {{/if}}
-                                <input type="number" name="pointsEarned[]" value="{{pointsEarned}}">/{{pointsPossible}}<br>
-                        {{/each}}
-                    {{else}}
-                        {{#each rubric.fields}}
-                            <h4>{{title}}</h4>
-                            {{#if description}}
-                                {{description}}<br>
-                            {{/if}}
-                            {{#if ../student}}
-                                <input type="number" name="pointsEarned[]" placeholder="0">/{{pointsPossible}}<br>
-                            {{else}}
-                                <input type="number" disabled>/{{pointsPossible}}<br>
-                            {{/if}}
-                        {{/each}}
-                    {{/if}}
-                    <h4>Additional Comments</h4>
-                    {{#if student}}
-                        <input type="text" name="comments" value="{{studentRubric.comments}}"><br>
-                    {{else}}
-                        <input type="text" disabled><br>
-                    {{/if}}
-                    <br>
-                    {{#if student}}
+                                {{#if ../student}}
+                                    <input type="number" name="pointsEarned[]" placeholder="0">/{{pointsPossible}}<br>
+                                {{else}}
+                                    <input type="number" disabled>/{{pointsPossible}}<br>
+                                {{/if}}
+                            {{/each}}
+                        {{/if}}
+                        <h4>Additional Comments</h4>
+                        {{#if studentRubric}}
+                            <input type="text" name="comments" value="{{studentRubric.comments}}"><br>
+                        {{else}}
+                            <input type="text" name="comments"><br>
+                        {{/if}}
+                        <br>
                         <input type="submit" value="Submit">
                     {{else}}
-                        <input type="submit" value="Submit" disabled>
+                        <h4>Please Select a Student to Begin Grading</h4>
                     {{/if}}
                 </form>
             </div>

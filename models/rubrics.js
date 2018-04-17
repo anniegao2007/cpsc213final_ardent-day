@@ -15,6 +15,7 @@ var Field = new Schema({
 
 const RubricSchema = new Schema({
     isMaster: Boolean,
+    masterId: String,
     classId: String,
     sectionId: [String],
     studentId: String,
