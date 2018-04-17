@@ -15,10 +15,10 @@ var Field = new Schema({
 
 const RubricSchema = new Schema({
     isMaster: Boolean,
-    masterId: String,
-    classId: String,
-    sectionId: [String],
-    studentId: String,
+    masterId: String, //the _id of the rubric that is the master
+    classId: String, //the _id of the class this rubric is for
+    sectionId: [String], //array of section _id's that this rubric is in
+    studentId: String, //this is the student's _id, a hash
     assignmentDate: Date,
     assignmentTitle: stringField,
     fields: [Field],

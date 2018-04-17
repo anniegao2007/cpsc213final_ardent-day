@@ -182,6 +182,12 @@ app.post('/class/create', (req, res) => {
     let instructors = req.body.instructors.trim().split(',');
     const regex = /.+@.+\..+/;
 
+    for(var i = 0; i < instructors.length; i++){
+        if(instructors[i] === ""){
+            instructors.splice(i, 1);
+        }
+    }
+
     if (className.length < 1 || className.length > 50) {
         errors.push('Class name must be between 1-50 characters.');
     }
@@ -604,12 +610,12 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res
                     return 0;
                 }
             });
-            Rubrics.find({ assignmentTitle: r.assignmentTitle, isMaster: false }, (err2, rubrics) => {
+            Rubrics.find({ masterId: r._id }, (err2, rubrics) => {
                 let joinStudentsRubrics = []; //student, totalScore, scores for each field, comments
                 let sketchyFieldsPlaceholder = [];
                 for(var i = 0; i < students.length; i++) {
                     for(var j = 0; j < rubrics.length; j++) {
-                        if(students[i].studentid === rubrics[j].studentId) {
+                        if(students[i]._id == rubrics[j].studentId) {
                             let pointsPossible = 0;
                             let pointsEarnedTotal = 0;
                             let fieldScores = [];
