@@ -534,7 +534,6 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId', (
         Students.find({sections: {$elemMatch: {$eq: SID}}}).collation({locale: "en", strength: 2}).sort({lastname: 1, firstname: 1}).exec(function (err, students) {
             Students.findOne({_id: stud}, (err, student) => {
                 Rubrics.findOne({studentId: stud, masterId: RID}, (err, studentRubric) => {
-                    console.log("found student rubric", studentRubric);
                     res.render('fillOut', {rubric, students, classId: CID, sectionId: SID, rubricId: RID, student, studentRubric});
                 });
             });
@@ -557,7 +556,6 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
     }
     Rubrics.findOne({studentId: studId, masterId: RID}, (err, studentRubric) => {
         if(studentRubric){
-            console.log("Rubric exists, updating its values");
             for(var i = 0; i < studentRubric.fields.length; i++){
                 studentRubric.fields[i].pointsEarned = points[i];
             }
@@ -566,7 +564,6 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
             });
         }
         else{
-            console.log("No rubric yet, creating a new one");
             Rubrics.findOne({_id: RID}, (err, rubric) => {
                 var newRubric = new Rubrics({
                     classId: CID,
