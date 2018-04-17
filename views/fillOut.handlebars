@@ -18,7 +18,7 @@
             </div>
 
             <div style="display:inline-block; margin: 0 auto !important; text-align:left;">
-                <form action="/class/{{classId}}/section/{{sectionId}}/rubric/{{rubricId}}/fillOut/{{student.studentid}}/submit" method="POST">
+                <form action="/class/{{classId}}/section/{{sectionId}}/rubric/{{rubricId}}/fillOut/{{student._id}}/submit" method="POST">
                     <h3>{{rubric.assignmentTitle}} Rubric</h3>
                     {{#if student}}
                         <h4>{{student.lastname}}, {{student.firstname}}</h4>
