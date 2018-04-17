@@ -79,7 +79,7 @@ function isLoggedIn(req, res, next) {
 
 let errors = [];
 
-// home page
+// home page or classes list
 app.get('/', (req, res) => {
     if (req.session.userId) {
         Users.findOne({ _id: req.session.userId }, (err, user) => {
@@ -298,8 +298,10 @@ app.post('/class/:classId/section/:sectId/edit', (req, res) => {
     const sectId = req.params.sectId;
     const newName = req.body.sName;
     const inst = req.body.instructor;
-    Sections.update({ _id: sectId }, { $set: { name: newName, instructor: inst }}, () => {
-        res.redirect(`/class/${classId}/section`);
+    Users.findOne({ email: inst }, (err, usr) => {
+        Sections.update({ _id: sectId }, { $set: { name: newName, instructor: usr.name, instructId: usr._id }}, () => {
+            res.redirect(`/class/${classId}/section`);
+        })
     });
 });
 
@@ -510,7 +512,7 @@ app.post('/class/:classId/section/:sectId/rubric/removeField', (req, res)=>{
     res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubric?date='+date+'&title='+title);
 });
 
-//fill out rubric
+//view rubrics and students
 app.get('/class/:classId/section/:sectId/rubric/:rubricId/fillOut', (req, res) => {
     var CID = req.params.classId;
     var SID = req.params.sectId;
@@ -522,41 +524,71 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/fillOut', (req, res) =
     });
 });
 
+//fill out rubric for specific student
+app.get('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId', (req, res) => {
+    var CID = req.params.classId;
+    var SID = req.params.sectId;
+    var RID = req.params.rubricId;
+    var stud = req.params.studentId;
+    Rubrics.findOne({_id: RID}, (err, rubric) => {
+        Students.find({sections: {$elemMatch: {$eq: SID}}}).collation({locale: "en", strength: 2}).sort({lastname: 1, firstname: 1}).exec(function (err, students) {
+            Students.findOne({_id: stud}, (err, student) => {
+                Rubrics.findOne({studentId: stud, masterId: RID}, (err, studentRubric) => {
+                    res.render('fillOut', {rubric, students, classId: CID, sectionId: SID, rubricId: RID, student, studentRubric});
+                });
+            });
+        });
+    });
+});
+
 //submit filled out rubric
-app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut', (req, res) => {
+app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/submit', (req, res) => {
     var CID = req.params.classId;
     var SID = req.params.sectId;
     var RID = req.params.rubricId;
     var points = req.body.pointsEarned;
-    var studId = req.body.student;
+    var studId = req.params.studentId;
     var cmnts = req.body.comments;
     for(var i = 0; i < points.length; i++){
         if(points[i] === ""){
             points[i] = 0;
         }
     }
-    Rubrics.findOne({_id: RID}, (err, rubric) => {
-        var newRubric = new Rubrics({
-            classId: CID,
-            studentId: studId,
-            comments: cmnts,
-            assignmentDate: rubric.assignmentDate,
-            assignmentTitle: rubric.assignmentTitle,
-            isMaster: false,
-        });
-        newRubric.sectionId.push(SID);
-        for(var i = 0; i < rubric.fields.length; i++){
-            newRubric.fields.push({title: rubric.fields[i].title,
-                pointsPossible: rubric.fields[i].pointsPossible,
-                pointsEarned: points[i],
-                description: rubric.fields[i].description,
+    Rubrics.findOne({studentId: studId, masterId: RID}, (err, studentRubric) => {
+        if(studentRubric){
+            for(var i = 0; i < studentRubric.fields.length; i++){
+                studentRubric.fields[i].pointsEarned = points[i];
+            }
+            Rubrics.update({studentId: studId, masterId: RID}, {$set: {fields: studentRubric.fields, comments: cmnts}}, () => {
+                res.redirect(`/class/${CID}/section/${SID}/rubric/${RID}/fillOut`);
             });
         }
-        newRubric.save(() => {
-            console.log(`Saved ${newRubric}`);
-            res.redirect(`/class/${CID}/section/${SID}/rubric/${RID}/fillOut`);
-        });
-    });
+        else{
+            Rubrics.findOne({_id: RID}, (err, rubric) => {
+                var newRubric = new Rubrics({
+                    classId: CID,
+                    studentId: studId,
+                    comments: cmnts,
+                    assignmentDate: rubric.assignmentDate,
+                    assignmentTitle: rubric.assignmentTitle,
+                    isMaster: false,
+                    masterId: RID,
+                });
+                newRubric.sectionId.push(SID);
+                for(var i = 0; i < rubric.fields.length; i++){
+                    newRubric.fields.push({title: rubric.fields[i].title,
+                        pointsPossible: rubric.fields[i].pointsPossible,
+                        pointsEarned: points[i],
+                        description: rubric.fields[i].description,
+                    });
+                }
+                newRubric.save(() => {
+                    console.log(`Saved ${newRubric}`);
+                    res.redirect(`/class/${CID}/section/${SID}/rubric/${RID}/fillOut`);
+                });
+            });
+        }
+    })
 });
 
 // Display list of students with their scores

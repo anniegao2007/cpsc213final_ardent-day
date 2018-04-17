@@ -15,13 +15,14 @@ var Field = new Schema({
 
 const RubricSchema = new Schema({
     isMaster: Boolean,
+    masterId: String,
     classId: String,
     sectionId: [String],
     studentId: String,
     assignmentDate: Date,
     assignmentTitle: stringField,
     fields: [Field],
-    comments: stringField,
+    comments: String,
 });
 
 module.exports = mongoose.model('Rubrics', RubricSchema);

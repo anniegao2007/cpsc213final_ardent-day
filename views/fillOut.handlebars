@@ -4,34 +4,62 @@
 <h3><a href="/">Classes</a> > <a href="/class/{{classId}}/section">Sections</a> > <a href="/class/{{classId}}/section/{{sectionId}}/rubric">Rubrics</a> > Grade Assignment</h3>
 
 {{#if students}}
-    <form action="/class/{{classId}}/section/{{sectionId}}/rubric/{{rubricId}}/fillOut" method="POST">
-
         <div style="text-align:center">
             <div style="float: left; text-align: left">
-                <h3>Select Student</h3>
-                {{#each students}}
-                    <label>
-                        <input type="radio" name="student" value="{{_id}}" required> {{lastname}}, {{firstname}}<br>
-                    </label>
-                {{/each}}
+                <form>
+                    <h3>Select Student</h3>
+                    {{#each students}}
+                        <label>
+                            <button type="submit" formaction="/class/{{../classId}}/section/{{../sectionId}}/rubric/{{../rubricId}}/fillOut/{{_id}}" formmethod="GET">Select</button>
+                            {{lastname}}, {{firstname}}<br>
+                            
+                        </label>
+                    {{/each}}
+                </form>
             </div>
 
             <div style="display:inline-block; margin: 0 auto !important; text-align:left;">
-                <h3>{{rubric.assignmentTitle}} Rubric</h3>
-                    {{#each rubric.fields}}
-                    <h4>{{title}}</h4>
-                    {{#if description}}
-                        {{description}}<br>
+                <form action="/class/{{classId}}/section/{{sectionId}}/rubric/{{rubricId}}/fillOut/{{student._id}}/submit" method="POST">
+                    <h3>{{rubric.assignmentTitle}} Rubric</h3>
+                    {{#if student}}
+                        <h4>{{student.lastname}}, {{student.firstname}}</h4>
+                    
+                        {{#if studentRubric}}
+                            {{#each studentRubric.fields}}
+                                    <h4>{{title}}</h4>
+                                    {{#if description}}
+                                        {{description}}<br>
+                                    {{/if}}
+                                    <input type="number" name="pointsEarned[]" value="{{pointsEarned}}">/{{pointsPossible}}<br>
+                            {{/each}}
+                        {{else}}
+                            {{#each rubric.fields}}
+                                <h4>{{title}}</h4>
+                                {{#if description}}
+                                    {{description}}<br>
+                                {{/if}}
+                                {{#if ../student}}
+                                    <input type="number" name="pointsEarned[]" placeholder="0">/{{pointsPossible}}<br>
+                                {{else}}
+                                    <input type="number" disabled>/{{pointsPossible}}<br>
+                                {{/if}}
+                            {{/each}}
+                        {{/if}}
+                        <h4>Additional Comments</h4>
+                        {{#if studentRubric}}
+                            <input type="text" name="comments" value="{{studentRubric.comments}}"><br>
+                        {{else}}
+                            <input type="text" name="comments"><br>
+                        {{/if}}
+                        <br>
+                        <input type="submit" value="Submit">
+                    {{else}}
+                        <h4>Please Select a Student to Begin Grading</h4>
                     {{/if}}
-                    <input type="number" name="pointsEarned[]" placeholder="0">/{{pointsPossible}}<br>
-                {{/each}}
-                <h4>Additional Comments</h4>
-                <input type="text" name="comments"><br>
-                <br>
-                <input type="submit" value="Complete">
+                </form>
             </div>
         </div>
-    </form>
+    
 {{else}}
     Add students to this section in order to grade assignments
     <br>

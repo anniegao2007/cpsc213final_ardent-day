@@ -11,8 +11,22 @@
 </div>
 
 <div style="display:inline-block; margin: 0 auto !important; text-align:left;">
-    <th><h2>Points Earned</h2></th>
-    {{#each studentsandgrades}}
+    <th><h2>Total Score [to be implemented]</h2></th>
+    {{#each points}}
+        <td>{{@index}}/{{totalPoints}}</td> 
+    {{/each}}
+</div>
+
+<div style="display:inline-block; margin: 0 auto !important; text-align:left;">
+    <th><h2>Scores for each field [to be implemented]</h2></th>
+    {{#each points}}
+        <td>{{@index}}/{{totalPoints}}</td> 
+    {{/each}}
+</div>
+
+<div style="display:inline-block; margin: 0 auto !important; text-align:left;">
+    <th><h2>Comments [to be implemented]</h2></th>
+    {{#each points}}
         <td>{{@index}}/{{totalPoints}}</td> 
     {{/each}}
 </div>
