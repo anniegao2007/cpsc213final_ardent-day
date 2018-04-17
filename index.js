@@ -561,9 +561,36 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut', (req, res) 
 
 // Display list of students with their scores
 app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res) => {
-    Students.find({ sections: req.params.sectId }, (err, students) => {
-        res.render('grades', { students });
-    });
+    var CID = req.params.classId;
+    var SID = req.params.sectId;
+    var RID = req.params.rubricId;
+    
+    //join the rubrics and students tables
+    //each student is bridged with the corresponding rubric that matches their studentid
+    //returns the student/grade hybrid document whose classes array contains the class id, whose sections array contain the section id,
+    Students.aggregate([
+        
+        {
+          $lookup:
+            {
+              from: "Rubrics",
+              localField: "_id",
+              foreignField: "studentId",
+              as: "grades"
+            }
+       }],
+       (err, studentsandgrades) => {
+        console.log(err, studentsandgrades);
+        res.render('grades', {studentsandgrades})
+        })
+       
+       /*,  { $unwind : "$classes" } , { $unwind : "$sections" },
+       {$match: { classes: CID }}],
+     (err, studentsandgrades) => {
+         console.log(err, studentsandgrades);
+         res.render('grades', {studentsandgrades})
+     }
+    )*/
 });
 
 // Edit rubric

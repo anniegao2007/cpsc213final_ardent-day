@@ -1,8 +1,9 @@
+<div style="padding-left:20px">
 <h1>Grades</h1>
 
 <div style="float: left; text-align: left">
     <th><h2>Student</h2></th> <br>
-    {{#each students}}
+    {{#each studentsandgrades}}
         <tr class="grades">
             <td>{{lastname}}, {{firstname}}</td> <br>
         </tr>
@@ -11,7 +12,8 @@
 
 <div style="display:inline-block; margin: 0 auto !important; text-align:left;">
     <th><h2>Points Earned</h2></th>
-    {{#each points}}
+    {{#each studentsandgrades}}
         <td>{{@index}}/{{totalPoints}}</td> 
     {{/each}}
+</div>
 </div>
