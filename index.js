@@ -637,7 +637,7 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res
                         }
                     }
                 }
-                res.render('grades', { sketchyFieldsPlaceholder, joinStudentsRubrics });
+                res.render('grades', { classId: req.params.classId, sectId: req.params.sectId, sketchyFieldsPlaceholder, joinStudentsRubrics });
             });
         });
     });
