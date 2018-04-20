@@ -24,3 +24,14 @@
         {{/each}}
     {{/if}}
 </table>
+<br>
+<h2>Assignment Overall Statistics</h2>
+    {{#if statistics}}
+        <p>Median: {{statistics.median}}</p>
+        <p>Average: {{statistics.mean}}</p>
+        <p>Standard Deviation: {{statistics.stddev}}</p>
+        <p>Low: {{statistics.low}}</p>
+        <p>High: {{statistics.high}}</p>
+    {{else}}
+        <h4>No grades or stats to display!</h4>
+    {{/if}}

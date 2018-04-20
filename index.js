@@ -8,6 +8,7 @@ const MongoDBStore = require('connect-mongodb-session')(session);
 const mongoose = require('mongoose');
 const validator = require('validator');
 const handlebarsintl = require('handlebars-intl');
+const ss = require('simple-statistics');
 const app = express();
 mongoose.connect(process.env.MONGO_URL);
 
@@ -613,21 +614,27 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res
             Rubrics.find({ masterId: r._id }, (err2, rubrics) => {
                 let joinStudentsRubrics = []; //student, totalScore, scores for each field, comments
                 let sketchyFieldsPlaceholder = [];
+                let totalFieldPts = [];
                 for(var i = 0; i < students.length; i++) {
                     for(var j = 0; j < rubrics.length; j++) {
                         if(students[i]._id == rubrics[j].studentId) {
                             let pointsPossible = 0;
                             let pointsEarnedTotal = 0;
                             let fieldScores = [];
+                            //let totalFieldPts = [];
+                            //let statistics = [];
                             sketchyFieldsPlaceholder = [];
+                            // let individualFieldPts = [];
                             for(var k = 0; k < rubrics[j].fields.length; k++) {
                                 sketchyFieldsPlaceholder.push({name: rubrics[j].fields[k].title});
                                 let tmpTotal = rubrics[j].fields[k].pointsPossible;
                                 let tmpEarned = rubrics[j].fields[k].pointsEarned;
+                                // individualFieldPts.push({ pts: rubrics[j].fields[k].pointsEarned });
                                 pointsPossible += tmpTotal;
                                 pointsEarnedTotal += tmpEarned;
                                 fieldScores.push({tmpEarned: tmpEarned, tmpTotal: tmpTotal});
                             }
+                            totalFieldPts.push(pointsEarnedTotal);
                             joinStudentsRubrics.push({stu: students[i], 
                                                     pointsEarnedTotal: pointsEarnedTotal, 
                                                     pointsPossible: pointsPossible, 
@@ -637,7 +644,17 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res
                         }
                     }
                 }
-                res.render('grades', { classId: req.params.classId, sectId: req.params.sectId, sketchyFieldsPlaceholder, joinStudentsRubrics });
+                let statistics = [];
+                if(totalFieldPts.length > 0) {
+                    statistics = { 
+                        low: ss.min(totalFieldPts), 
+                        high: ss.max(totalFieldPts),
+                        mean: ss.mean(totalFieldPts).toFixed(3),
+                        median: ss.median(totalFieldPts),
+                        stddev: ss.standardDeviation(totalFieldPts).toFixed(3),
+                     };
+                }
+                res.render('grades', { classId: req.params.classId, sectId: req.params.sectId, sketchyFieldsPlaceholder, joinStudentsRubrics, statistics });
             });
         });
     });
