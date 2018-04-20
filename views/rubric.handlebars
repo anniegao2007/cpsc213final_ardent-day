@@ -1,3 +1,4 @@
+<div style="padding-left:20px">
 {{#if errors}}
 <div>
 <ul style="color:red" class="errors">
@@ -18,7 +19,7 @@
         <thead>
             <th>Assignment Date</th>
             <th>Assignment Name</th>
-            <th> </th>
+            <th> </th> <th> </th> <th> </th> <th> </th>
         </thead>
             {{#each rubrics}}
                 <tr class="rubric">
@@ -71,5 +72,10 @@
         </div>
         <br>
         <button type="submit" value="Add Assignment">Add Assignment</button>
+        <br><br>
     </form>
+</div>
+<br>
+ <a href="/class/{{resultClass._id}}/section">Back</a>
+ <br>
 </div>

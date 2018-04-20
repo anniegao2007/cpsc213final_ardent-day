@@ -1,3 +1,4 @@
+<div style="padding-left:20px">
 {{#if errors}}
 <div>
 <ul style="color:red" class="errors">
@@ -19,6 +20,7 @@
             <th>Last, First</th>
             <th>ID</th>
             <th>Email</th>
+            <th> </th><th> </th>
         </thead>
             {{#each students}}
                 <tr class="students">
@@ -57,4 +59,8 @@
         <button type="submit" value="Add Student"> Add Student </button>
         <br><br>
     </form>
+</div>
+<br>
+<a href="/class/{{currentSection.classId}}/section">Back</a>
+ <br>
 </div>
