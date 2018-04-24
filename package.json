@@ -30,6 +30,7 @@
     "handlebars-intl": "^1.1.2",
     "heroku": "^0.2.0",
     "mongoose": "^5.0.9",
+    "plotly": "^1.0.6",
     "simple-statistics": "^5.3.1",
     "validator": "^9.4.1"
   },

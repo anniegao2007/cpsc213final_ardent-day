@@ -11,6 +11,7 @@ const handlebarsintl = require('handlebars-intl');
 const ss = require('simple-statistics');
 const app = express();
 mongoose.connect(process.env.MONGO_URL);
+const plotly = require('plotly')("ardent-day", "mpWDqBKdKQDkPalrCoeN");
 
 const Users = require('./models/users.js');
 const Classes = require('./models/classes.js');
@@ -653,8 +654,18 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res
                         median: ss.median(totalFieldPts),
                         stddev: ss.standardDeviation(totalFieldPts).toFixed(3),
                      };
+                     const histogramData = [{
+                         x: totalFieldPts,
+                         type: "histogram"
+                     }];
+                     let graphOptions = {filename: "basic-histogram", fileopt: "overwrite"};
+                     plotly.plot(histogramData, graphOptions, function(err, msg) {
+                        //console.log(msg);
+                        res.render('grades', { classId: req.params.classId, sectId: req.params.sectId, sketchyFieldsPlaceholder, joinStudentsRubrics, statistics });
+                     });
+                } else {
+                    res.render('grades', { classId: req.params.classId, sectId: req.params.sectId, sketchyFieldsPlaceholder, joinStudentsRubrics, statistics });
                 }
-                res.render('grades', { classId: req.params.classId, sectId: req.params.sectId, sketchyFieldsPlaceholder, joinStudentsRubrics, statistics });
             });
         });
     });
