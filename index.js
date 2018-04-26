@@ -478,6 +478,7 @@ app.post('/class/:classId/section/:sectId/rubric/create', (req, res) => {
     const fieldNames = req.body.fieldNames;
     const fieldValues = req.body.fieldValues;
     const fieldDescriptions = req.body.fieldDescriptions;
+    const radio = req.body.scope;
     for(var i  = 0; i < fieldData.length; i++){
         if(fieldNames[i] === "" || fieldValues[i] === ""){
             errors.push("Please fill out all Field Names and Max Points");
@@ -497,15 +498,31 @@ app.post('/class/:classId/section/:sectId/rubric/create', (req, res) => {
             assignmentTitle: title,
             isMaster: true,
         });
-        newRubric.sectionId.push(sectId);
-        for(var i = 0; i < fieldData.length; i++){
-            newRubric.fields.push({title: fieldNames[i], pointsPossible: fieldValues[i], description: fieldDescriptions[i]});
+        if(radio === "thisSection") {
+            newRubric.sectionId.push(sectId);
+            for(var i = 0; i < fieldData.length; i++){
+                newRubric.fields.push({title: fieldNames[i], pointsPossible: fieldValues[i], description: fieldDescriptions[i]});
+            }
+            newRubric.save(() => {
+                console.log(`Saved ${newRubric}`);
+                fieldData = [""];
+                res.redirect(`/class/${classId}/section/${sectId}/rubric`);
+            });
+        } else {
+            Sections.find({ classId: classId }, (err, sects) => {
+                for(var i = 0; i < sects.length; i++) {
+                    newRubric.sectionId.push(sects[i]._id);
+                }
+                for(var i = 0; i < fieldData.length; i++){
+                    newRubric.fields.push({title: fieldNames[i], pointsPossible: fieldValues[i], description: fieldDescriptions[i]});
+                }
+                newRubric.save(() => {
+                    console.log(`Saved ${newRubric}`);
+                    fieldData = [""];
+                    res.redirect(`/class/${classId}/section/${sectId}/rubric`);
+                });
+            });
         }
-        newRubric.save(() => {
-            console.log(`Saved ${newRubric}`);
-            fieldData = [""];
-            res.redirect(`/class/${classId}/section/${sectId}/rubric`);
-        });
     } else {
         fieldData = [];
         for(var i = 0; i < fieldNames.length; i++){
@@ -749,6 +766,7 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => 
     Rubrics.findOne({ _id: req.params.rubricId }, (err, rubric) => {
         for(var i = 0; i < fieldNames.length; i++) {
             if(fieldNames[i]) {
+                console.log(`fieldNames[i]: ${fieldNames[i]}`);
                 rubric.fields[i].title = fieldNames[i];
             }
             if(fieldDescs[i]) {
