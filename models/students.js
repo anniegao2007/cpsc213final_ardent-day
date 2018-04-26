@@ -12,7 +12,7 @@ const StudentSchema = new Schema({
         maxlength: 50,
         lowercase: true,
     },
-    sections: [String],
+    sections: [String], //sectionids
     classes: [String],
 });
 

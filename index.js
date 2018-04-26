@@ -243,6 +243,24 @@ app.post('/class/:id/edit', (req, res) => {
     });
 });
 
+// Delete class
+app.get('/class/:id/delete', (req, res) => {
+    const cId = req.params.id;
+    Classes.findOne({ _id: cId }, (err, c) => {
+        if(c.instructors.length > 1) {
+            let instIndex = c.instructors.indexOf(cId);
+            c.instructors.splice(instIndex, 1);
+            Classes.update({ _id: cId }, { $set: { instructors: c.instructors }}, () => {
+                res.redirect('/');
+            });
+        } else {
+            Classes.remove({ _id: req.params.id }, () => {
+                res.redirect('/');
+            })
+        }
+    });
+});
+
 // Load all sections in a class
 app.get('/class/:id/section', (req, res) => {
     const id = req.params.id;
@@ -280,10 +298,33 @@ app.post('/class/:id/section/create', (req, res) => {
 
 // Delete section
 app.post('/class/:classId/section/:id/delete', (req, res) => {
-    const sectionId = req.params.id;
+    const sectionID = req.params.id;
     const classId = req.params.classId;
-    Sections.findOne({ _id: sectionId }, (err, resultClass) => {
+    Sections.findOne({ _id: sectionID }, (err, resultClass) => {
+        // delete all rubrics and remove sectionid from each student
         Sections.remove(resultClass, () => {
+            /* Students.find({ section: sectionID }, (err1, students) => {
+                for(var i = 0; i < students.length; i++) {
+                    let sectIndex = students[i].sections.indexOf(sectionID);
+                    students[i].sections.splice(sectIndex, 1);
+                    Students.update({ _id: students[i]._id }, { $set: { sections: students[i].sections }}, (err2) => {
+                        if(err2) {
+                            console.log(err2);
+                        }
+                    });
+                }
+                Rubrics.find({ sectionId: sectionID }, (err1, rubs) => {
+                    for(var i = 0; i < rubs.length; i++) {
+                        let sectIndex = rubs[i].sectionId.indexOf(sectionID);
+                        rubs[i].sectionId.splice(sectIndex, 1);
+                        Rubrics.update({ _id: rubs[i]._id }, { $set: { sectionId: rubs[i].sectionId }}, (err2) => {
+                            if(err2) {
+                                console.log(err2);
+                            }
+                        });
+                    }
+                });
+            }); */
             res.redirect(`/class/${classId}/section`);
         });
     });
