@@ -526,6 +526,24 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/delete', (req, res) =
     
 });
 
+// clone rubric
+app.get('/class/:classId/section/:sectId/rubric/:rubricId/clone', (req, res) => {
+    Rubrics.findOne({ _id: req.params.rubricId }, (err, r) => {
+        const newRubric = new Rubrics ({
+            isMaster: true,
+            classId: req.params.classId,
+            sectionId: r.sectionId,
+            assignmentDate: r.assignmentDate,
+            assignmentTitle: `${r.assignmentTitle} Clone`,
+            fields: r.fields,
+        });
+        newRubric.save(() => {
+            console.log(`Saved: ${newRubric}`);
+            res.redirect(`/class/${req.params.classId}/section/${req.params.sectId}/rubric`);
+        });
+    })
+});
+
 //add a field to rubric
 app.post('/class/:classId/section/:sectId/rubric/addField', (req, res)=>{
     const date = req.body.date;
