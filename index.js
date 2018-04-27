@@ -613,7 +613,7 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => 
     const fieldNames = req.body.fieldName;
     const fieldDescs = req.body.fieldDesc;
     const fieldPts = req.body.fieldPts;
-    Rubrics.findOne({ _id: req.params.rubricId }, (err, rubric) => {
+    Rubrics.findOne({ _id: req.params.rubricId, isMaster: true }, (err, rubric) => {
         if((typeof fieldNames) === "object") {
             for(var i = 0; i < fieldNames.length; i++) {
                 if(fieldNames[i]) {
@@ -718,7 +718,7 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
 
 // Display list of students with their scores
 app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res) => {
-    Rubrics.findOne({ _id: req.params.rubricId }, (err, r) => {
+    Rubrics.findOne({ _id: req.params.rubricId, isMaster: true }, (err, r) => {
         Students.find({ sections: req.params.sectId }, (err1, students) => {
             students.sort(function(a, b) {
                 if(a.lastname < b.lastname) {
@@ -733,10 +733,11 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res
                 let joinStudentsRubrics = []; //student, totalScore, scores for each field, comments
                 let sketchyFieldsPlaceholder = [];
                 let totalFieldPts = [];
+                let pointsPossible = 0;
                 for(var i = 0; i < students.length; i++) {
                     for(var j = 0; j < rubrics.length; j++) {
                         if(students[i]._id == rubrics[j].studentId) {
-                            let pointsPossible = 0;
+                            pointsPossible = 0;
                             let pointsEarnedTotal = 0;
                             let fieldScores = [];
                             //let totalFieldPts = [];
@@ -775,7 +776,17 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res
                          x: totalFieldPts,
                          type: "histogram"
                      }];
-                     let graphOptions = {filename: "basic-histogram", fileopt: "overwrite"};
+                     const layout = {
+                         xaxis: { 
+                             range: [0, pointsPossible ],
+                             title: "Overall Score", 
+                         },
+                         yaxis: { 
+                             range: [0, students.length],
+                             title: "Number of Students", 
+                        },
+                     };
+                     let graphOptions = {layout: layout, filename: "basic-histogram", fileopt: "overwrite"};
                      plotly.plot(histogramData, graphOptions, function(err, msg) {
                         //console.log(msg);
                         res.render('grades', { classId: req.params.classId, sectId: req.params.sectId, sketchyFieldsPlaceholder, joinStudentsRubrics, statistics });
