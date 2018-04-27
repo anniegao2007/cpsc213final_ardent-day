@@ -59,13 +59,28 @@
     <form action="edit" method="POST">
         Assignment Date: <input type="date" name="date" value="{{rubric.assignmentDate}}"> <br>
         Assignment Title: <input type="text" name="title" value="{{rubric.assignmentTitle}}"> <br>
-        {{#each rubric.fields}}
-            Field Name: <input type="text" name="fieldName" value="{{title}}"> <br>
-            <BLOCKQUOTE>
-                Field Description: <input type="text" name="fieldDesc" value="{{description}}"> <br>
-                Points Possible: <input type="number" name="fieldPts" value="{{pointsPossible}}"> <br>
-            </BLOCKQUOTE> <br>
-        {{/each}}
+        {{#if data}}
+            {{#each data}}
+                <BLOCKQUOTE>
+                    Field Name: <input type="text" name="fieldName[]" value="{{title}}"> <br>
+                    Field Description: <input type="text" name="fieldDesc[]" value="{{description}}"> <br>
+                    Points Possible: <input type="number" name="fieldPts[]" value="{{pointsPossible}}"> <br>
+                </BLOCKQUOTE> <br>
+            {{/each}}
+        {{else}}
+            {{#each rubric.fields}}
+                <BLOCKQUOTE>
+                    Field Name: <input type="text" name="fieldName[]" value="{{title}}"> <br>
+                    Field Description: <input type="text" name="fieldDesc[]" value="{{description}}"> <br>
+                    Points Possible: <input type="number" name="fieldPts[]" value="{{pointsPossible}}"> <br>
+                </BLOCKQUOTE> <br>
+            {{/each}}
+        {{/if}}
+        <br>
+        <div>
+            <button type="submit" formaction="edit/addField" formmethod="POST">Add Field</button>
+            <button type="submit" formaction="edit/removeField" formmethod="POST">Remove Last Field</button>
+        </div>
         <button type="submit" value="update"> Update </button>
     </form>
     <form action="/class/{{classID}}/section/{{sectionID}}/rubric" method="GET">
