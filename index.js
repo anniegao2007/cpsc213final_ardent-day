@@ -632,7 +632,9 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => 
             rubric.fields[0].pointsPossible = fieldPts;
         }
         Rubrics.update({ _id: req.params.rubricId }, { $set: { assignmentDate: date, assignmentTitle: title, fields: rubric.fields }}, () => {
-            res.redirect(`/class/${req.params.classId}/section/${req.params.sectId}/rubric`);
+            Rubrics.remove({masterId: req.params.rubricId}, () =>{
+                res.redirect(`/class/${req.params.classId}/section/${req.params.sectId}/rubric`);
+            })
         });
     });
 });
