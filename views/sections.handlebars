@@ -8,6 +8,10 @@
 </div>
 {{/if}}
 
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
 <h1>{{resultClass.name}}</h1>
 
 <h2>Sections</h2>
@@ -26,6 +30,22 @@
                 <tr class="sections">
                     <td>{{name}}</td>
                     <td>{{instructor}}</td>
+
+                    <td>
+                        <div class="container">
+                            <div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"> Options
+                                <span class="caret"></span></button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="section/{{_id}}/student"> Manage Students </a></li>
+                                    <li><a href="section/{{this._id}}/rubric"> Manage Assignments </a></li>
+                                    <li><a href="section/{{_id}}/edit"> Edit </a></li>
+                                    <li><a href="section/{{_id}}/delete"> Delete </a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </td>
+                    <!--
                     <td>
                         <form action="section/{{_id}}/student" method="GET">
                             <input type="submit" value="Manage Students">
@@ -42,10 +62,11 @@
                         </form>
                     </td>
                     <td>
-                        <form action="section/{{_id}}/delete" method="POST">
+                        <form action="section/{{_id}}/delete" method="GET">
                             <input type="submit" value="Delete">
                         </form>
                     </td>
+                    -->
                 </tr>
             {{/each}}
         {{else}}

@@ -7,7 +7,9 @@ const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const mongoose = require('mongoose');
 const validator = require('validator');
+const handlebars = require('handlebars');
 const handlebarsintl = require('handlebars-intl');
+handlebarsintl.registerWith(handlebars);
 const ss = require('simple-statistics');
 const app = express();
 mongoose.connect(process.env.MONGO_URL);
@@ -297,7 +299,7 @@ app.post('/class/:id/section/create', (req, res) => {
 });
 
 // Delete section
-app.post('/class/:classId/section/:id/delete', (req, res) => {
+app.get('/class/:classId/section/:id/delete', (req, res) => {
     const sectionID = req.params.id;
     const classId = req.params.classId;
     Sections.findOne({ _id: sectionID }, (err, resultClass) => {
@@ -429,7 +431,7 @@ app.post('/class/:classId/section/:sectionId/student/:studentId/edit', (req, res
 });
 
 // Delete a student from a section
-app.post('/class/:classId/section/:sectionId/student/:studentId/delete', (req, res) => {
+app.get('/class/:classId/section/:sectionId/student/:studentId/delete', (req, res) => {
     const sectId = req.params.sectionId;
     const cId = req.params.classId;
     const studentId = req.params.studentId;
@@ -533,7 +535,7 @@ app.post('/class/:classId/section/:sectId/rubric/create', (req, res) => {
 });
 
 //delete rubric from list
-app.post('/class/:classId/section/:sectId/rubric/:rubricId/delete', (req, res) => {
+app.get('/class/:classId/section/:sectId/rubric/:rubricId/delete', (req, res) => {
     Rubrics.remove({_id:req.params.rubricId}, function(err){
         if(err){
             console.log("Uh oh error deleting rubric");

@@ -8,6 +8,11 @@
 </div>
 {{/if}}
 
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+
 <h1>{{resultClass.name}}</h1>
 
 <h2>Rubrics</h2>
@@ -23,8 +28,26 @@
         </thead>
             {{#each rubrics}}
                 <tr class="rubric">
-                    <td>{{assignmentDate}}</td>
+                    <td>{{formatDate assignmentDate day="numeric" month="long" year="numeric"}}</td>
+                    <!-- <td>{{assignmentDate}}</td> -->
                     <td>{{assignmentTitle}}</td>
+
+                    <td>
+                        <div class="container">
+                            <div class="dropdown">
+                                <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"> Options
+                                <span class="caret"></span></button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="rubric/{{_id}}/fillOut"> Grade </a></li>
+                                    <li><a href="rubric/{{_id}}/viewScores"> View Scores </a></li>
+                                    <li><a href="rubric/{{_id}}/edit"> Edit </a></li>
+                                    <li><a href="rubric/{{_id}}/delete"> Delete </a></li>
+                                    <li><a href="rubric/{{_id}}/clone"> Clone Rubric </a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </td>
+                    <!--
                     <td>
                         <form action="rubric/{{_id}}/fillOut" method="GET">
                             <input type="submit" value="Grade">
@@ -41,7 +64,7 @@
                         </form>
                     </td>
                     <td>
-                        <form action="rubric/{{_id}}/delete" method="POST">
+                        <form action="rubric/{{_id}}/delete" method="GET">
                             <input type="submit" value="Delete">
                         </form>
                     </td>
@@ -50,6 +73,7 @@
                             <input type="submit" value="Clone Rubric">
                         </form>
                     </td>
+                    -->
                 </tr>
             {{/each}}
         {{else}}
