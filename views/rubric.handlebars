@@ -83,7 +83,7 @@
 </div>
 <br><br>
 <div class ="createMenu">
-    <h2>Create Assignment</h2>
+    <h2>Create Point-Based Assignment</h2>
     <form action="rubric/create" method="POST">
         Assignment Date: <input type="date" name="date" value="{{date}}"> <br>
         Assignment Name: <input type="text" name="title" value="{{title}}"> <br>
@@ -110,6 +110,36 @@
         <br><br>
     </form>
 </div>
+
+<div class ="createMenu">
+    <h2>Create Standards-Based Assignment</h2>
+    <form action="rubric/create" method="POST">
+        Assignment Date: <input type="date" name="date" value="{{date}}"> <br>
+        Assignment Name: <input type="text" name="title" value="{{title}}"> <br>
+        <h3>Configure Rubric:</h3>
+        {{#each data}}
+            Field Name: <input type="text" name="fieldNames[]" value="{{title}}"><br>
+            Max Points: <input type="number" name="fieldValues[]" value="{{pointsPossible}}"><br>
+            Description: <input type="text" name="fieldDescriptions[]" value="{{description}}"><br>
+            <br>
+        {{/each}}
+        <br>
+        <div>
+            <button type="submit" formaction="rubric/addField" formmethod="POST">Add Field</button>
+            <button type="submit" formaction="rubric/removeField" formmethod="POST">Remove Last Field</button>
+        </div>
+        <br>
+        Create Rubric For: <br>
+        <div>
+            <label><input type="radio" name="scope" value="wholeClass"> All sections in class</label> <br>
+            <label><input type="radio" name="scope" value="thisSection"> Just this section</label><br>
+        </div>
+        <br>
+        <button type="submit" value="Add Assignment">Add Assignment</button>
+        <br><br>
+    </form>
+</div>
+
 <br>
  <a href="/class/{{resultClass._id}}/section">Back</a>
  <br>
