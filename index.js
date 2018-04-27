@@ -604,12 +604,12 @@ app.post('/class/:classId/section/:sectId/rubric/removeField', (req, res)=>{
 app.get('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => {
     const id = req.params.rubricId;
     Rubrics.findOne({ _id: id }, (err, rubric) => {
-        /*if(rubric){
-            fieldData = [];
-            for(var i = 0; i < rubric.fields.length; i++){
-                fieldData.push({title: rubric.fields[i].title, description: rubric.fields[i].description, pointsPossible: rubric.fields[i].pointsPossible});
-            }
-        }*/
+        
+        editFieldData = [];
+        for(var i = 0; i < rubric.fields.length; i++){
+            editFieldData.push({title: rubric.fields[i].title, description: rubric.fields[i].description, pointsPossible: rubric.fields[i].pointsPossible});
+        }
+        
         res.render('editing', { rubric, classID: req.params.classId, sectionID: req.params.sectId, data: editFieldData, errors });
         editFieldData = [];
         errors = [];
