@@ -466,7 +466,7 @@ app.get('/class/:classId/section/:sectId/rubric', (req, res) => {
             Rubrics.find({sectionId: {$elemMatch: {$eq: sectId}}, isMaster: true}, (err1, rubrics) => {
                 res.render('rubric', {errors, resultClass, resultSection, rubrics, date: assignmentDate, title: assignmentTitle, data: fieldData});
                 errors = [];
-                fieldData = [];
+                fieldData = [""];
             });
         });
     });
@@ -610,7 +610,7 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => {
             }
         }*/
         res.render('editing', { rubric, classID: req.params.classId, sectionID: req.params.sectId, data: fieldData, errors });
-        fieldData = [];
+        fieldData = [""];
         errors = [];
     });
 });
@@ -683,7 +683,7 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => 
             }
             Rubrics.update({ _id: req.params.rubricId }, { $set: { assignmentDate: date, assignmentTitle: title, fields: fieldData }}, () => {
                 Rubrics.remove({masterId: req.params.rubricId}, () =>{
-                    fieldData = [];
+                    fieldData = [""];
                     res.redirect(`/class/${req.params.classId}/section/${req.params.sectId}/rubric`);
                 })
             });
