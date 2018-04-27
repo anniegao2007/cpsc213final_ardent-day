@@ -504,7 +504,7 @@ app.post('/class/:classId/section/:sectId/rubric/create', (req, res) => {
         });
         if(radio === "thisSection") {
             newRubric.sectionId.push(sectId);
-            for(var i = 0; i < fieldData.length; i++){
+            for(var i = 0; i < fieldNames.length; i++){
                 newRubric.fields.push({title: fieldNames[i], pointsPossible: fieldValues[i], description: fieldDescriptions[i]});
             }
             newRubric.save(() => {
@@ -517,7 +517,7 @@ app.post('/class/:classId/section/:sectId/rubric/create', (req, res) => {
                 for(var i = 0; i < sects.length; i++) {
                     newRubric.sectionId.push(sects[i]._id);
                 }
-                for(var i = 0; i < fieldData.length; i++){
+                for(var i = 0; i < fieldNames.length; i++){
                     newRubric.fields.push({title: fieldNames[i], pointsPossible: fieldValues[i], description: fieldDescriptions[i]});
                 }
                 newRubric.save(() => {
@@ -603,6 +603,7 @@ var fieldChanged = 0;
 // Edit rubric
 app.get('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => {
     const id = req.params.rubricId;
+    const assignmentDate = req.query.date;
     Rubrics.findOne({ _id: id }, (err, rubric) => {
         if(!fieldChanged){
             editFieldData = [];
@@ -614,7 +615,7 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => {
             fieldChanged = 0;
         }
         
-        res.render('editing', { rubric, classID: req.params.classId, sectionID: req.params.sectId, data: editFieldData, errors });
+        res.render('editing', { rubric, classID: req.params.classId, date: assignmentDate, sectionID: req.params.sectId, data: editFieldData, errors });
         editFieldData = [];
         errors = [];
     });
@@ -623,7 +624,6 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => {
 //add a field to rubric during edit
 app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit/addField', (req, res)=>{
     const date = req.body.date;
-    const title = req.body.title;
     const fieldNames = req.body.fieldName;
     const fieldValues = req.body.fieldPts;
     const fieldDescriptions = req.body.fieldDesc;
@@ -633,13 +633,12 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit/addField', (req,
     }
     editFieldData.push("");
     fieldChanged = 1;
-    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubric/'+req.params.rubricId+'/edit?date='+date+'&title='+title);
+    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubric/'+req.params.rubricId+'/edit?date='+date);
 });
 
 //remove last field from rubric during edit
 app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit/removeField', (req, res)=>{
     const date = req.body.date;
-    const title = req.body.title;
     const fieldNames = req.body.fieldName;
     const fieldValues = req.body.fieldPts;
     const fieldDescriptions = req.body.fieldDesc;
@@ -654,7 +653,7 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit/removeField', (r
     else{
         errors.push("Cannot remove last remaining field");
     }
-    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubric/'+req.params.rubricId+'/edit?date='+date+'&title='+title);
+    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubric/'+req.params.rubricId+'/edit?date='+date);
 });
 
 // Update edits
