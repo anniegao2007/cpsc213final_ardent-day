@@ -609,7 +609,7 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => {
                 fieldData.push({title: rubric.fields[i].title, description: rubric.fields[i].description, pointsPossible: rubric.fields[i].pointsPossible});
             }
         }*/
-        res.render('editing', { rubric, classID: req.params.classId, sectionID: req.params.sectId, data: fieldData });
+        res.render('editing', { rubric, classID: req.params.classId, sectionID: req.params.sectId, data: fieldData, errors });
         fieldData = [];
         errors = [];
     });
