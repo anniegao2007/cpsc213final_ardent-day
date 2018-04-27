@@ -454,6 +454,7 @@ app.get('/class/:classId/section/:sectionId/student/:studentId/delete', (req, re
 });
 
 var fieldData = [""];
+var editFieldData = [];
 
 // Load all rubrics in a class
 app.get('/class/:classId/section/:sectId/rubric', (req, res) => {
@@ -609,8 +610,8 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => {
                 fieldData.push({title: rubric.fields[i].title, description: rubric.fields[i].description, pointsPossible: rubric.fields[i].pointsPossible});
             }
         }*/
-        res.render('editing', { rubric, classID: req.params.classId, sectionID: req.params.sectId, data: fieldData, errors });
-        fieldData = [""];
+        res.render('editing', { rubric, classID: req.params.classId, sectionID: req.params.sectId, data: editFieldData, errors });
+        editFieldData = [];
         errors = [];
     });
 });
@@ -622,11 +623,11 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit/addField', (req,
     const fieldNames = req.body.fieldName;
     const fieldValues = req.body.fieldPts;
     const fieldDescriptions = req.body.fieldDesc;
-    fieldData = [];
+    editFieldData = [];
     for(var i = 0; i < fieldNames.length; i++){
-        fieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i]});
+        editFieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i]});
     }
-    fieldData.push("");
+    editFieldData.push("");
     res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubric/'+req.params.rubricId+'/edit?date='+date+'&title='+title);
 });
 
@@ -637,12 +638,12 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit/removeField', (r
     const fieldNames = req.body.fieldName;
     const fieldValues = req.body.fieldPts;
     const fieldDescriptions = req.body.fieldDesc;
-    fieldData = [];
+    editFieldData = [];
     for(var i = 0; i < fieldNames.length; i++){
-        fieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i]});
+        editFieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i]});
     }
-    if(fieldData.length > 1){
-        fieldData.pop();
+    if(editFieldData.length > 1){
+        editFieldData.pop();
     }
     else{
         errors.push("Cannot remove last remaining field");
@@ -657,7 +658,7 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => 
     const fieldNames = req.body.fieldName;
     const fieldDescriptions = req.body.fieldDesc;
     const fieldValues = req.body.fieldPts;
-    for(var i  = 0; i < fieldData.length; i++){
+    for(var i  = 0; i < editFieldData.length; i++){
         if(fieldNames[i] === "" || fieldValues[i] === ""){
             errors.push("Please fill out all Field Names and Max Points");
             break;
@@ -672,27 +673,27 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => 
     if(errors.length === 0){
         Rubrics.findOne({ _id: req.params.rubricId, isMaster: true }, (err, rubric) => {
             if((typeof fieldNames) === "object") {
-                fieldData = [];
+                editFieldData = [];
                 for(var i = 0; i < fieldNames.length; i++){
-                    fieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i]});
+                    editFieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i]});
                 }
             } else if((typeof fieldNames) === "string") {
                 rubric.fields[0].title = fieldNames;
                 rubric.fields[0].description = fieldDescs;
                 rubric.fields[0].pointsPossible = fieldPts;
             }
-            Rubrics.update({ _id: req.params.rubricId }, { $set: { assignmentDate: date, assignmentTitle: title, fields: fieldData }}, () => {
+            Rubrics.update({ _id: req.params.rubricId }, { $set: { assignmentDate: date, assignmentTitle: title, fields: editFieldData }}, () => {
                 Rubrics.remove({masterId: req.params.rubricId}, () =>{
-                    fieldData = [""];
+                    editFieldData = [];
                     res.redirect(`/class/${req.params.classId}/section/${req.params.sectId}/rubric`);
                 })
             });
         });
     }
     else{
-        fieldData = [];
+        editFieldData = [];
         for(var i = 0; i < fieldNames.length; i++){
-            fieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i]});
+            editFieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i]});
         }
         res.redirect("/class/"+req.params.classId+"/section/"+req.params.sectId+"/rubric/"+req.params.rubricId+"/edit");
     }
