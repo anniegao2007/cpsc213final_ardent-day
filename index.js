@@ -776,6 +776,11 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res
                      };
                      const histogramData = [{
                          x: totalFieldPts,
+                         xbins: {
+                            start: 0,
+                            end: pointsPossible,
+                            size: pointsPossible / 6,
+                         },
                          type: "histogram"
                      }];
                      const layout = {
@@ -787,6 +792,7 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res
                              range: [0, students.length],
                              title: "Number of Students", 
                         },
+                        bargap: 0.15,
                      };
                      let graphOptions = {layout: layout, filename: "basic-histogram", fileopt: "overwrite"};
                      plotly.plot(histogramData, graphOptions, function(err, msg) {
