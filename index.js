@@ -603,7 +603,7 @@ var fieldChanged = 0;
 // Edit rubric
 app.get('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => {
     const id = req.params.rubricId;
-    const assignmentDate = req.query.date;
+    var assignmentDate = req.query.date;
     Rubrics.findOne({ _id: id }, (err, rubric) => {
         if(!fieldChanged){
             editFieldData = [];
@@ -614,6 +614,23 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => {
         else{
             fieldChanged = 0;
         }
+        var d = new Date(rubric.assignmentDate),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = '' + d.getFullYear();
+
+        if (month.length < 2){ month = '0' + month;}
+        if (day.length < 2){ day = '0' + day;}
+        if (year.length < 4){
+            var zero = "";
+            for(var i = 0; i < 4 - year.length; i++){
+                zero += '0';
+            }
+            year = zero + year;
+        }
+        var stringDate = [year, month, day].join('-')
+        console.log("date from rubric", stringDate);
+        if(!assignmentDate){assignmentDate = stringDate;}
         
         res.render('editing', { rubric, classID: req.params.classId, date: assignmentDate, sectionID: req.params.sectId, data: editFieldData, errors });
         editFieldData = [];
@@ -663,8 +680,8 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => 
     const fieldNames = req.body.fieldName;
     const fieldDescriptions = req.body.fieldDesc;
     const fieldValues = req.body.fieldPts;
-    for(var i  = 0; i < editFieldData.length; i++){
-        if(fieldNames[i] === "" || fieldValues[i] === ""){
+    for(var i  = 0; i < fieldNames.length; i++){
+        if(fieldNames[i] == "" || fieldValues[i] == ""){
             errors.push("Please fill out all Field Names and Max Points");
             break;
         }
@@ -701,7 +718,7 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => 
             editFieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i]});
         }
         fieldChanged = 1;
-        res.redirect("/class/"+req.params.classId+"/section/"+req.params.sectId+"/rubric/"+req.params.rubricId+"/edit");
+        res.redirect("/class/"+req.params.classId+"/section/"+req.params.sectId+"/rubric/"+req.params.rubricId+"/edit?date="+date);
     }
 });
 
