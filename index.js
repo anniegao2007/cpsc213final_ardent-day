@@ -454,6 +454,7 @@ app.get('/class/:classId/section/:sectionId/student/:studentId/delete', (req, re
 });
 
 var fieldData = [""];
+var editFieldData = [];
 
 // Load all rubrics in a class
 app.get('/class/:classId/section/:sectId/rubric', (req, res) => {
@@ -466,6 +467,7 @@ app.get('/class/:classId/section/:sectId/rubric', (req, res) => {
             Rubrics.find({sectionId: {$elemMatch: {$eq: sectId}}, isMaster: true}, (err1, rubrics) => {
                 res.render('rubric', {errors, resultClass, resultSection, rubrics, date: assignmentDate, title: assignmentTitle, data: fieldData});
                 errors = [];
+                fieldData = [""];
             });
         });
     });
@@ -502,7 +504,7 @@ app.post('/class/:classId/section/:sectId/rubric/create', (req, res) => {
         });
         if(radio === "thisSection") {
             newRubric.sectionId.push(sectId);
-            for(var i = 0; i < fieldData.length; i++){
+            for(var i = 0; i < fieldNames.length; i++){
                 newRubric.fields.push({title: fieldNames[i], pointsPossible: fieldValues[i], description: fieldDescriptions[i]});
             }
             newRubric.save(() => {
@@ -515,7 +517,7 @@ app.post('/class/:classId/section/:sectId/rubric/create', (req, res) => {
                 for(var i = 0; i < sects.length; i++) {
                     newRubric.sectionId.push(sects[i]._id);
                 }
-                for(var i = 0; i < fieldData.length; i++){
+                for(var i = 0; i < fieldNames.length; i++){
                     newRubric.fields.push({title: fieldNames[i], pointsPossible: fieldValues[i], description: fieldDescriptions[i]});
                 }
                 newRubric.save(() => {
@@ -597,13 +599,78 @@ app.post('/class/:classId/section/:sectId/rubric/removeField', (req, res)=>{
     }
     res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubric?date='+date+'&title='+title);
 });
-
+var fieldChanged = 0;
 // Edit rubric
 app.get('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => {
     const id = req.params.rubricId;
+    var assignmentDate = req.query.date;
     Rubrics.findOne({ _id: id }, (err, rubric) => {
-        res.render('editing', { rubric, classID: req.params.classId, sectionID: req.params.sectId });
+        if(!fieldChanged){
+            editFieldData = [];
+            for(var i = 0; i < rubric.fields.length; i++){
+                editFieldData.push({title: rubric.fields[i].title, description: rubric.fields[i].description, pointsPossible: rubric.fields[i].pointsPossible});
+            }
+        }
+        else{
+            fieldChanged = 0;
+        }
+        var d = new Date(rubric.assignmentDate),
+        month = '' + (d.getMonth() + 1),
+        day = '' + d.getDate(),
+        year = '' + d.getFullYear();
+
+        if (month.length < 2){ month = '0' + month;}
+        if (day.length < 2){ day = '0' + day;}
+        if (year.length < 4){
+            var zero = "";
+            for(var i = 0; i < 4 - year.length; i++){
+                zero += '0';
+            }
+            year = zero + year;
+        }
+        var stringDate = [year, month, day].join('-')
+        console.log("date from rubric", stringDate);
+        if(!assignmentDate){assignmentDate = stringDate;}
+        
+        res.render('editing', { rubric, classID: req.params.classId, date: assignmentDate, sectionID: req.params.sectId, data: editFieldData, errors });
+        editFieldData = [];
+        errors = [];
     });
+});
+
+//add a field to rubric during edit
+app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit/addField', (req, res)=>{
+    const date = req.body.date;
+    const fieldNames = req.body.fieldName;
+    const fieldValues = req.body.fieldPts;
+    const fieldDescriptions = req.body.fieldDesc;
+    editFieldData = [];
+    for(var i = 0; i < fieldNames.length; i++){
+        editFieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i]});
+    }
+    editFieldData.push("");
+    fieldChanged = 1;
+    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubric/'+req.params.rubricId+'/edit?date='+date);
+});
+
+//remove last field from rubric during edit
+app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit/removeField', (req, res)=>{
+    const date = req.body.date;
+    const fieldNames = req.body.fieldName;
+    const fieldValues = req.body.fieldPts;
+    const fieldDescriptions = req.body.fieldDesc;
+    editFieldData = [];
+    for(var i = 0; i < fieldNames.length; i++){
+        editFieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i]});
+    }
+    if(editFieldData.length > 1){
+        editFieldData.pop();
+        fieldChanged = 1;
+    }
+    else{
+        errors.push("Cannot remove last remaining field");
+    }
+    res.redirect('/class/' + req.params.classId + '/section/' + req.params.sectId + '/rubric/'+req.params.rubricId+'/edit?date='+date);
 });
 
 // Update edits
@@ -611,30 +678,48 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => 
     const date = req.body.date;
     const title = req.body.title;
     const fieldNames = req.body.fieldName;
-    const fieldDescs = req.body.fieldDesc;
-    const fieldPts = req.body.fieldPts;
-    Rubrics.findOne({ _id: req.params.rubricId, isMaster: true }, (err, rubric) => {
-        if((typeof fieldNames) === "object") {
-            for(var i = 0; i < fieldNames.length; i++) {
-                if(fieldNames[i]) {
-                    rubric.fields[i].title = fieldNames[i];
-                }
-                if(fieldDescs[i]) {
-                    rubric.fields[i].description = fieldDescs[i];
-                }
-                if(fieldPts[i]) {
-                    rubric.fields[i].pointsPossible = fieldPts[i];
-                }
-            }
-        } else if((typeof fieldNames) === "string") {
-            rubric.fields[0].title = fieldNames;
-            rubric.fields[0].description = fieldDescs;
-            rubric.fields[0].pointsPossible = fieldPts;
+    const fieldDescriptions = req.body.fieldDesc;
+    const fieldValues = req.body.fieldPts;
+    for(var i  = 0; i < fieldNames.length; i++){
+        if(fieldNames[i] == "" || fieldValues[i] == ""){
+            errors.push("Please fill out all Field Names and Max Points");
+            break;
         }
-        Rubrics.update({ _id: req.params.rubricId }, { $set: { assignmentDate: date, assignmentTitle: title, fields: rubric.fields }}, () => {
-            res.redirect(`/class/${req.params.classId}/section/${req.params.sectId}/rubric`);
+    }
+    if(date === "" || title === ""){
+        errors.push("Please fill out Assignment Date and Name");
+    }
+    if (title.length < 1 || title.length > 50) {
+        errors.push('Assignment name must be between 1-50 characters.');
+    }
+    if(errors.length === 0){
+        Rubrics.findOne({ _id: req.params.rubricId, isMaster: true }, (err, rubric) => {
+            if((typeof fieldNames) === "object") {
+                editFieldData = [];
+                for(var i = 0; i < fieldNames.length; i++){
+                    editFieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i]});
+                }
+            } else if((typeof fieldNames) === "string") {
+                rubric.fields[0].title = fieldNames;
+                rubric.fields[0].description = fieldDescs;
+                rubric.fields[0].pointsPossible = fieldPts;
+            }
+            Rubrics.update({ _id: req.params.rubricId }, { $set: { assignmentDate: date, assignmentTitle: title, fields: editFieldData }}, () => {
+                Rubrics.remove({masterId: req.params.rubricId}, () =>{
+                    editFieldData = [];
+                    res.redirect(`/class/${req.params.classId}/section/${req.params.sectId}/rubric`);
+                })
+            });
         });
-    });
+    }
+    else{
+        editFieldData = [];
+        for(var i = 0; i < fieldNames.length; i++){
+            editFieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i]});
+        }
+        fieldChanged = 1;
+        res.redirect("/class/"+req.params.classId+"/section/"+req.params.sectId+"/rubric/"+req.params.rubricId+"/edit?date="+date);
+    }
 });
 
 //view rubrics and students
@@ -774,17 +859,23 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res
                      };
                      const histogramData = [{
                          x: totalFieldPts,
+                         xbins: {
+                            start: 0,
+                            end: pointsPossible * (7/6.0),
+                            size: pointsPossible / 7,
+                         },
                          type: "histogram"
                      }];
                      const layout = {
                          xaxis: { 
-                             range: [0, pointsPossible ],
+                             range: [0, pointsPossible * (7/6.0) ],
                              title: "Overall Score", 
                          },
                          yaxis: { 
                              range: [0, students.length],
                              title: "Number of Students", 
                         },
+                        bargap: 0.15,
                      };
                      let graphOptions = {layout: layout, filename: "basic-histogram", fileopt: "overwrite"};
                      plotly.plot(histogramData, graphOptions, function(err, msg) {
