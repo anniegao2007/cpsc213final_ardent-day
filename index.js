@@ -862,13 +862,13 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res
                          xbins: {
                             start: 0,
                             end: pointsPossible,
-                            size: pointsPossible / 6,
+                            size: pointsPossible / 7,
                          },
                          type: "histogram"
                      }];
                      const layout = {
                          xaxis: { 
-                             range: [0, pointsPossible ],
+                             range: [0, pointsPossible * (8/7) ],
                              title: "Overall Score", 
                          },
                          yaxis: { 
