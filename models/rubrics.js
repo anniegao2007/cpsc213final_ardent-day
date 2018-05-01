@@ -11,6 +11,7 @@ var Field = new Schema({
     description: String,
     pointsEarned: Number,
     pointsPossible: Number,
+    criteria: [String],
 });
 
 const RubricSchema = new Schema({
