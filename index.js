@@ -861,7 +861,7 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res
                          x: totalFieldPts,
                          xbins: {
                             start: 0,
-                            end: pointsPossible,
+                            end: pointsPossible * (7/6.0),
                             size: pointsPossible / 7,
                          },
                          type: "histogram"
