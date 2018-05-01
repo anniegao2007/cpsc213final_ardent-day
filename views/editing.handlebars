@@ -63,16 +63,16 @@
             {{#each data}}
                 <BLOCKQUOTE>
                     Field Name: <input type="text" name="fieldName[]" value="{{title}}"> <br>
-                    Field Description: <input type="text" name="fieldDesc[]" value="{{description}}"> <br>
                     Points Possible: <input type="number" name="fieldPts[]" value="{{pointsPossible}}"> <br>
+                    Field Description: <input type="text" name="fieldDesc[]" value="{{description}}"> <br>
                 </BLOCKQUOTE> <br>
             {{/each}}
         {{else}}
             {{#each rubric.fields}}
                 <BLOCKQUOTE>
                     Field Name: <input type="text" name="fieldName[]" value="{{title}}"> <br>
-                    Field Description: <input type="text" name="fieldDesc[]" value="{{description}}"> <br>
                     Points Possible: <input type="number" name="fieldPts[]" value="{{pointsPossible}}"> <br>
+                    Field Description: <input type="text" name="fieldDesc[]" value="{{description}}"> <br>
                 </BLOCKQUOTE> <br>
             {{/each}}
         {{/if}}
