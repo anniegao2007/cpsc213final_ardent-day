@@ -15,11 +15,17 @@ const app = express();
 mongoose.connect(process.env.MONGO_URL);
 const plotly = require('plotly')("ardent-day", "mpWDqBKdKQDkPalrCoeN");
 
-const Users = require('./models/users.js');
-const Classes = require('./models/classes.js');
-const Rubrics = require('./models/rubrics.js');
-const Sections = require('./models/sections.js');
-const Students = require('./models/students.js');
+const classModels = require('./models/classes.js');
+const sectionModels = require('./models/sections.js');
+const userModels = require('./models/users.js');
+const studentModels = require('./models/students.js');
+const rubricModels = require('./models/rubrics.js');
+
+const Classes = classModels.Classes;
+const Sections = sectionModels.Sections;
+const Users = userModels.Users;
+const Students = studentModels.Students;
+const Rubrics = rubricModels.Rubrics;
 
 const userControllers = require('./controllers/users.js');
 const classControllers = require('./controllers/classes.js');

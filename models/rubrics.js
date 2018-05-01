@@ -25,4 +25,6 @@ const RubricSchema = new Schema({
     comments: String,
 });
 
-module.exports = mongoose.model('Rubrics', RubricSchema);
+module.exports = {
+    Rubrics: mongoose.model('Rubrics', RubricSchema),
+}

@@ -1,10 +1,17 @@
-const Classes = require('../models/classes.js');
-const Sections = require('../models/sections.js');
-const Users = require('../models/users.js');
-const Students = require('../models/students.js');
-const Rubrics = require('../models/rubrics.js');
+const classModels = require('../models/classes.js');
+const sectionModels = require('../models/sections.js');
+const userModels = require('../models/users.js');
+const studentModels = require('../models/students.js');
+const rubricModels = require('../models/rubrics.js');
+
 const ss = require('simple-statistics');
 const plotly = require('plotly')("ardent-day", "mpWDqBKdKQDkPalrCoeN");
+
+const Classes = classModels.Classes;
+const Sections = sectionModels.Sections;
+const Users = userModels.Users;
+const Students = studentModels.Students;
+const Rubrics = rubricModels.Rubrics;
 
 async function loadAll(req, res){
     const assignmentDate = req.query.date;
