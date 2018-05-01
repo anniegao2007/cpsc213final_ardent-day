@@ -1,3 +1,5 @@
+<link href="/static/main.css" rel="stylesheet">
+
 <div style="padding-left:20px">
 {{#if errors}}
 <div>
@@ -11,7 +13,7 @@
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-
+<link href="/static/main.css" rel="stylesheet">
 
 <h1>{{resultClass.name}}</h1>
 
@@ -100,7 +102,7 @@
             <button type="submit" formaction="rubric/removeField" formmethod="POST">Remove Last Field</button>
         </div>
         <br>
-        Create Rubric For: <br>
+        <h3>Create Rubric For: </h3>
         <div>
             <label><input type="radio" name="scope" value="wholeClass"> All sections in class</label> <br>
             <label><input type="radio" name="scope" value="thisSection"> Just this section</label><br>
