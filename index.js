@@ -868,7 +868,7 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res
                      }];
                      const layout = {
                          xaxis: { 
-                             range: [0, pointsPossible * (8/7) ],
+                             range: [0, pointsPossible * (7/6) ],
                              title: "Overall Score", 
                          },
                          yaxis: { 
