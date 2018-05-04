@@ -801,6 +801,7 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
                         pointsPossible: rubric.fields[i].pointsPossible,
                         pointsEarned: points[i],
                         description: rubric.fields[i].description,
+                        criteria: rubric.fields[i].criteria,
                     });
                 }
                 newRubric.save(() => {
