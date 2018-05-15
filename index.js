@@ -240,7 +240,7 @@ app.get('/class/:id/edit', (req, res) => {
 app.post('/class/:id/edit', (req, res) => {
     const newName = req.body.classname;
     const instructors = req.body.instructors.trim().split(',');
-    console.log(instructors);
+    //console.log(instructors);
     Classes.update({ _id: req.params.id }, { $set: { name: newName, instructors }}, () => {
         res.redirect('/');
     });
@@ -788,8 +788,13 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId', (
         Students.find({sections: {$elemMatch: {$eq: SID}}}).collation({locale: "en", strength: 2}).sort({lastname: 1, firstname: 1}).exec(function (err, students) {
             Students.findOne({_id: stud}, (err, student) => {
                 Rubrics.findOne({studentId: stud, masterId: RID}, (err, studentRubric) => {
-                    //console.log(rubric.fields[0].criteria);
-                    res.render('fillOut', {rubric, students, classId: CID, sectionId: SID, rubricId: RID, student, studentRubric});
+                    let currentTotal = 0;
+                    for(var i = 0; i < studentRubric.fields.length; i++) {
+                        for(var j = 0; j < studentRubric.fields[i].criteria.length; j++) {
+                            currentTotal += parseInt(studentRubric.fields[i].criteria[j][1]);
+                        }
+                    }
+                    res.render('fillOut', {rubric, students, classId: CID, sectionId: SID, rubricId: RID, student, studentRubric, currentTotal});
                 });
             });
         });
@@ -801,16 +806,16 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
     var CID = req.params.classId;
     var SID = req.params.sectId;
     var RID = req.params.rubricId;
-    var points = req.body.pointsEarned;
+    //var points = req.body.pointsEarned;
     var studId = req.params.studentId;
     var cmnts = req.body.comments;
     var slider = req.body.sliderScore;
-    console.log(`slider: ${slider}`);
-    for(var i = 0; i < points.length; i++){
+    var finalScore = req.body.finalScore;
+    /*for(var i = 0; i < points.length; i++){
         if(points[i] === ""){
             points[i] = 0;
         }
-    }
+    }*/
     Rubrics.findOne({studentId: studId, masterId: RID}, (err, studentRubric) => {
         if(studentRubric){
             let sliderCounter = 0;
@@ -825,7 +830,7 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
                 // studentRubric.fields[i].pointsEarned = points[i];
                 studentRubric.fields[i].pointsEarned = totalPts;
             }
-            Rubrics.update({studentId: studId, masterId: RID}, {$set: {fields: studentRubric.fields, comments: cmnts}}, () => {
+            Rubrics.update({studentId: studId, masterId: RID}, {$set: {fields: studentRubric.fields, comments: cmnts, finalScore}}, () => {
                 res.redirect(`/class/${CID}/section/${SID}/rubric/${RID}/fillOut`);
             });
         }
@@ -839,6 +844,7 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
                     assignmentTitle: rubric.assignmentTitle,
                     isMaster: false,
                     masterId: RID,
+                    finalScore: finalScore,
                 });
                 newRubric.sectionId.push(SID);
                 let sliderCounter = 0;
@@ -903,8 +909,10 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res
                                 pointsEarnedTotal += tmpEarned;
                                 fieldScores.push({tmpEarned: tmpEarned, tmpTotal: tmpTotal});
                             }
-                            totalFieldPts.push(pointsEarnedTotal);
-                            joinStudentsRubrics.push({stu: students[i], 
+                            //totalFieldPts.push(pointsEarnedTotal);
+                            totalFieldPts.push(rubrics[j].finalScore);
+                            joinStudentsRubrics.push({stu: students[i],
+                                                    finalScore: rubrics[j].finalScore, 
                                                     pointsEarnedTotal: pointsEarnedTotal, 
                                                     pointsPossible: pointsPossible, 
                                                     fieldScores: fieldScores, 

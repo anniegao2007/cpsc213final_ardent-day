@@ -6,6 +6,7 @@
 <table id="grades">
     <thead>
         <th>Student</th>
+        <th>Final Score</th>
         <th>Total Score</th>
         {{#if sketchyFieldsPlaceholder}}
             {{#each sketchyFieldsPlaceholder}}
@@ -18,6 +19,7 @@
         {{#each joinStudentsRubrics}}
             <tr class="studentData">
                 <td>{{stu.lastname}}, {{stu.firstname}}</td>
+                <td>{{finalScore}} / {{pointsPossible}}</td>
                 <td>{{pointsEarnedTotal}} / {{pointsPossible}}</td>
                 {{#each fieldScores}}
                     <td>{{tmpEarned}}/{{tmpTotal}}</td>

@@ -34,11 +34,11 @@
                                     {{/if}} <br>
                                     {{#if criteria}}
                                         {{#each criteria}}
-                                            {{this.[0]}} <br> <input type="range" min="0" max="{{divide ../pointsPossible ../criteria.length}}" step="1" value="{{this.[1]}}" class="slider" list="tickmarks" name="sliderScore[]"> <br>
-                                            Current Score: {{this.[1]}} <br> <br>
+                                            {{this.[0]}} - Current Score: {{this.[1]}} <br>
+                                            <br> <input type="range" min="0" max="{{divide ../pointsPossible ../criteria.length}}" step="1" value="{{this.[1]}}" class="slider" list="tickmarks" name="sliderScore[]"> <br>
                                         {{/each}}
                                     {{/if}}
-                                    <input type="number" name="pointsEarned[]" value="{{pointsEarned}}">/{{pointsPossible}}<br>
+                                    Field Score: {{pointsEarned}} / {{pointsPossible}}<br> <br>
                             {{/each}}
                         {{else}}
                             {{#each rubric.fields}}
@@ -48,25 +48,29 @@
                                 {{/if}} <br>
                                 {{#if criteria}}
                                     {{#each criteria}}
-                                        {{this.[0]}} <br> <input type="range" min="0" max="{{divide ../pointsPossible ../criteria.length}}" step="1" value="{{this.[1]}}" class="slider" list="tickmarks" name="sliderScore[]"> <br>
-                                        Current Score: {{this.[1]}} <br> <br>
+                                        {{this.[0]}} - Current Score: {{this.[1]}} <br>
+                                        <br> <input type="range" min="0" max="{{divide ../pointsPossible ../criteria.length}}" step="1" value="{{this.[1]}}" class="slider" list="tickmarks" name="sliderScore[]"> <br>
                                     {{/each}}
                                 {{/if}} <br>
-                                {{#if ../student}}
+                                <!--{{#if ../student}}
                                     <input type="number" name="pointsEarned[]" placeholder="0">/{{pointsPossible}}<br>
-                                {{else}}
+                                {{else}}-->
                                     <input type="number" disabled>/{{pointsPossible}}<br>
-                                {{/if}}
+                                <!--{{/if}}-->
                             {{/each}}
                         {{/if}}
+                        <br>
+                        <h4>Current Grade: {{currentTotal}}</h4>
+                        <h4>Final Grade: </h4> <input type="number" name="finalScore" placeholder="{{currentTotal}}" value="{{studentRubric.finalScore}}"> <br>
                         <h4>Additional Comments</h4>
                         {{#if studentRubric}}
                             <input type="text" name="comments" value="{{studentRubric.comments}}"><br>
                         {{else}}
                             <input type="text" name="comments"><br>
-                        {{/if}}
-                        <br>
+                        {{/if}} <br>
+
                         <input type="submit" value="Submit">
+
                     {{else}}
                         <h4>Please Select a Student to Begin Grading</h4>
                     {{/if}}
