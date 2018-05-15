@@ -678,11 +678,7 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit/addField', (req,
     const fieldCriteria = req.body.fieldCriteria;
     editFieldData = [];
     for(var i = 0; i < fieldNames.length; i++){
-        let criteriaStrings = fieldCriteria[i].trim().split(',');
-        let criteria = [];
-        for(var j = 0; j < criteriaStrings.length; j++) {
-            criteria.push([criteriaStrings[j], 0]);
-        }
+        let criteria = fieldCriteria[i].trim().split(',');
         editFieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i], criteria});
     }
     editFieldData.push("");
