@@ -821,6 +821,7 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
     Rubrics.findOne({studentId: studId, masterId: RID}, (err, studentRubric) => {
         if(studentRubric){
             let sliderCounter = 0;
+            let almostFinalScore = 0;
             for(var i = 0; i < studentRubric.fields.length; i++){
                 let totalPts = 0;
                 for(var j = 0; j < studentRubric.fields[i].criteria.length; j++) {
@@ -829,8 +830,12 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
                     // console.log(`slider[sliderCounter] = ${slider[sliderCounter]}`);
                     sliderCounter++;
                 }
+                almostFinalScore += totalPts;
                 // studentRubric.fields[i].pointsEarned = points[i];
                 studentRubric.fields[i].pointsEarned = totalPts;
+            }
+            if(finalScore === "") {
+                finalScore = almostFinalScore;
             }
             Rubrics.update({studentId: studId, masterId: RID}, {$set: {fields: studentRubric.fields, comments: cmnts, finalScore}}, () => {
                 res.redirect(`/class/${CID}/section/${SID}/rubric/${RID}/fillOut`);
@@ -850,6 +855,7 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
                 });
                 newRubric.sectionId.push(SID);
                 let sliderCounter = 0;
+                let almostFinalScore = 0;
                 for(var i = 0; i < rubric.fields.length; i++){
                     let totalPts = 0;
                     for(var j = 0; j < rubric.fields[i].criteria.length; j++) {
@@ -858,12 +864,16 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
                         // console.log(`slider[sliderCounter] = ${slider[sliderCounter]}`);
                         sliderCounter++;
                     }
+                    almostFinalScore += totalPts;
                     newRubric.fields.push({title: rubric.fields[i].title,
                         pointsPossible: rubric.fields[i].pointsPossible,
                         pointsEarned: totalPts,
                         description: rubric.fields[i].description,
                         criteria: rubric.fields[i].criteria,
                     });
+                }
+                if(finalScore === "") {
+                    newRubric.finalScore = almostFinalScore;
                 }
                 newRubric.save(() => {
                     console.log(`Saved ${newRubric}`);
