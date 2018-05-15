@@ -10,6 +10,7 @@ const validator = require('validator');
 const handlebars = require('handlebars');
 const handlebarsintl = require('handlebars-intl');
 handlebarsintl.registerWith(handlebars);
+const math = require('handlebars-helpers')(['math']);
 const ss = require('simple-statistics');
 const app = express();
 mongoose.connect(process.env.MONGO_URL);
@@ -465,6 +466,7 @@ app.get('/class/:classId/section/:sectId/rubric', (req, res) => {
     Classes.findOne({ _id: classId }, (err, resultClass) => {
         Sections.findOne({ _id: sectId }, (err, resultSection) => {
             Rubrics.find({sectionId: {$elemMatch: {$eq: sectId}}, isMaster: true}, (err1, rubrics) => {
+                // console.log(rubrics);
                 res.render('rubric', {errors, resultClass, resultSection, rubrics, date: assignmentDate, title: assignmentTitle, data: fieldData});
                 errors = [];
                 fieldData = [""];
@@ -506,7 +508,12 @@ app.post('/class/:classId/section/:sectId/rubric/create', (req, res) => {
         if(radio === "thisSection") {
             newRubric.sectionId.push(sectId);
             for(var i = 0; i < fieldNames.length; i++){
-                let criteria = fieldCriteria[i].trim().split(',');
+                let criteriaStrings = fieldCriteria[i].trim().split(',');
+                //console.log(criteriaStrings);
+                let criteria = [];
+                for(var j = 0; j < criteriaStrings.length; j++) {
+                    criteria.push([criteriaStrings[j], 0 ]);
+                }
                 newRubric.fields.push({title: fieldNames[i], pointsPossible: fieldValues[i], description: fieldDescriptions[i], criteria});
             }
             newRubric.save(() => {
@@ -520,7 +527,12 @@ app.post('/class/:classId/section/:sectId/rubric/create', (req, res) => {
                     newRubric.sectionId.push(sects[i]._id);
                 }
                 for(var i = 0; i < fieldNames.length; i++){
-                    let criteria = fieldCriteria[i].trim().split(',');
+                    let criteriaStrings = fieldCriteria[i].trim().split(',');
+                    //console.log(criteriaStrings);
+                    let criteria = [];
+                    for(var j = 0; j < criteriaStrings.length; j++) {
+                        criteria.push([criteriaStrings[j], 0 ]);
+                    }
                     newRubric.fields.push({title: fieldNames[i], pointsPossible: fieldValues[i], description: fieldDescriptions[i], criteria});
                 }
                 newRubric.save(() => {
@@ -533,7 +545,11 @@ app.post('/class/:classId/section/:sectId/rubric/create', (req, res) => {
     } else {
         fieldData = [];
         for(var i = 0; i < fieldNames.length; i++){
-            let criteria = fieldCriteria[i].trim().split(',');
+            let criteriaStrings = fieldCriteria[i].trim().split(',');
+            let criteria = [];
+            for(var j = 0; j < criteriaStrings.length; j++) {
+                criteria.push([criteriaStrings[j], 0 ]);
+            }
             fieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i], criteria});
         }
         res.redirect("/class/"+classId+"/section/"+sectId+"/rubric?date="+date+"&title="+title);
@@ -614,10 +630,16 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => {
     const id = req.params.rubricId;
     var assignmentDate = req.query.date;
     Rubrics.findOne({ _id: id }, (err, rubric) => {
+        console.log(rubric);
         if(!fieldChanged){
             editFieldData = [];
             for(var i = 0; i < rubric.fields.length; i++){
-                editFieldData.push({title: rubric.fields[i].title, description: rubric.fields[i].description, pointsPossible: rubric.fields[i].pointsPossible, criteria: rubric.fields[i].criteria});
+                let criteriaChunks = rubric.fields[i].criteria;
+                let criteria = [];
+                for(var j = 0; j < criteriaChunks.length; j++) {
+                    criteria.push(criteriaChunks[j][0]);
+                }
+                editFieldData.push({title: rubric.fields[i].title, description: rubric.fields[i].description, pointsPossible: rubric.fields[i].pointsPossible, criteria});
             }
         }
         else{
@@ -656,7 +678,11 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit/addField', (req,
     const fieldCriteria = req.body.fieldCriteria;
     editFieldData = [];
     for(var i = 0; i < fieldNames.length; i++){
-        let criteria = fieldCriteria[i].trim().split(',');
+        let criteriaStrings = fieldCriteria[i].trim().split(',');
+        let criteria = [];
+        for(var j = 0; j < criteriaStrings.length; j++) {
+            criteria.push([criteriaStrings[j], 0]);
+        }
         editFieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i], criteria});
     }
     editFieldData.push("");
@@ -673,7 +699,11 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit/removeField', (r
     const fieldCriteria = req.body.fieldCriteria;
     editFieldData = [];
     for(var i = 0; i < fieldNames.length; i++){
-        let criteria = fieldCriteria[i].trim().split(',');
+        let criteriaStrings = fieldCriteria[i].trim().split(',');
+        let criteria = [];
+        for(var j = 0; j < criteriaStrings.length; j++) {
+            criteria.push([criteriaStrings[j], 0 ]);
+        }
         editFieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i], criteria});
     }
     if(editFieldData.length > 1){
@@ -710,7 +740,11 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => 
         Rubrics.findOne({ _id: req.params.rubricId, isMaster: true }, (err, rubric) => {
             editFieldData = [];
             for(var i = 0; i < fieldNames.length; i++){
-                let criteria = fieldCriteria[i].trim().split(',');
+                let criteriaStrings = fieldCriteria[i].trim().split(',');
+            let criteria = [];
+            for(var j = 0; j < criteriaStrings.length; j++) {
+                criteria.push([criteriaStrings[j], 0 ]);
+            }
                 editFieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i], criteria});
             }
             Rubrics.update({ _id: req.params.rubricId }, { $set: { assignmentDate: date, assignmentTitle: title, fields: editFieldData }}, () => {
@@ -724,7 +758,11 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => 
     else{
         editFieldData = [];
         for(var i = 0; i < fieldNames.length; i++){
-            let criteria = fieldCriteria[i].trim().split(',');
+            let criteriaStrings = fieldCriteria[i].trim().split(',');
+            let criteria = [];
+            for(var j = 0; j < criteriaStrings.length; j++) {
+                criteria.push([criteriaStrings[j], 0 ]);
+            }
             editFieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i], criteria});
         }
         fieldChanged = 1;
@@ -754,7 +792,7 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId', (
         Students.find({sections: {$elemMatch: {$eq: SID}}}).collation({locale: "en", strength: 2}).sort({lastname: 1, firstname: 1}).exec(function (err, students) {
             Students.findOne({_id: stud}, (err, student) => {
                 Rubrics.findOne({studentId: stud, masterId: RID}, (err, studentRubric) => {
-                    // console.log(rubric.fields[0].criteria);
+                    //console.log(rubric.fields[0].criteria);
                     res.render('fillOut', {rubric, students, classId: CID, sectionId: SID, rubricId: RID, student, studentRubric});
                 });
             });
@@ -770,6 +808,8 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
     var points = req.body.pointsEarned;
     var studId = req.params.studentId;
     var cmnts = req.body.comments;
+    var slider = req.body.sliderScore;
+    console.log(`slider: ${slider}`);
     for(var i = 0; i < points.length; i++){
         if(points[i] === ""){
             points[i] = 0;
@@ -777,8 +817,17 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
     }
     Rubrics.findOne({studentId: studId, masterId: RID}, (err, studentRubric) => {
         if(studentRubric){
+            let sliderCounter = 0;
             for(var i = 0; i < studentRubric.fields.length; i++){
-                studentRubric.fields[i].pointsEarned = points[i];
+                let totalPts = 0;
+                for(var j = 0; j < studentRubric.fields[i].criteria.length; j++) {
+                    studentRubric.fields[i].criteria[j][1] = slider[sliderCounter];
+                    totalPts += parseInt(slider[sliderCounter]);
+                    // console.log(`slider[sliderCounter] = ${slider[sliderCounter]}`);
+                    sliderCounter++;
+                }
+                // studentRubric.fields[i].pointsEarned = points[i];
+                studentRubric.fields[i].pointsEarned = totalPts;
             }
             Rubrics.update({studentId: studId, masterId: RID}, {$set: {fields: studentRubric.fields, comments: cmnts}}, () => {
                 res.redirect(`/class/${CID}/section/${SID}/rubric/${RID}/fillOut`);
@@ -796,10 +845,18 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
                     masterId: RID,
                 });
                 newRubric.sectionId.push(SID);
+                let sliderCounter = 0;
                 for(var i = 0; i < rubric.fields.length; i++){
+                    let totalPts = 0;
+                    for(var j = 0; j < rubric.fields[i].criteria.length; j++) {
+                        rubric.fields[i].criteria[j][1] = slider[sliderCounter];
+                        totalPts += parseInt(slider[sliderCounter]);
+                        // console.log(`slider[sliderCounter] = ${slider[sliderCounter]}`);
+                        sliderCounter++;
+                    }
                     newRubric.fields.push({title: rubric.fields[i].title,
                         pointsPossible: rubric.fields[i].pointsPossible,
-                        pointsEarned: points[i],
+                        pointsEarned: totalPts,
                         description: rubric.fields[i].description,
                         criteria: rubric.fields[i].criteria,
                     });

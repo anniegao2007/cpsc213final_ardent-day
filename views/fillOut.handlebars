@@ -33,9 +33,9 @@
                                         {{description}}<br>
                                     {{/if}} <br>
                                     {{#if criteria}}
-                                        Criteria: <br>
                                         {{#each criteria}}
-                                            <input type="checkbox" name="criteriaMet" value="{{this}}">{{this}} <br>
+                                            {{this.[0]}} <br> <input type="range" min="0" max="{{divide ../pointsPossible ../criteria.length}}" step="1" value="{{this.[1]}}" class="slider" list="tickmarks" name="sliderScore[]"> <br>
+                                            Current Score: {{this.[1]}} <br> <br>
                                         {{/each}}
                                     {{/if}}
                                     <input type="number" name="pointsEarned[]" value="{{pointsEarned}}">/{{pointsPossible}}<br>
@@ -47,9 +47,9 @@
                                     {{description}}<br>
                                 {{/if}} <br>
                                 {{#if criteria}}
-                                    Criteria: <br>
                                     {{#each criteria}}
-                                        <input type="checkbox" name="criteriaMet" value="{{this}}">{{this}} <br>
+                                        {{this.[0]}} <br> <input type="range" min="0" max="{{divide ../pointsPossible ../criteria.length}}" step="1" value="{{this.[1]}}" class="slider" list="tickmarks" name="sliderScore[]"> <br>
+                                        Current Score: {{this.[1]}} <br> <br>
                                     {{/each}}
                                 {{/if}} <br>
                                 {{#if ../student}}
