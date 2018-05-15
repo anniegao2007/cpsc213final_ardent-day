@@ -31,6 +31,12 @@
                                     <h4>{{title}}</h4>
                                     {{#if description}}
                                         {{description}}<br>
+                                    {{/if}} <br>
+                                    {{#if criteria}}
+                                        {{#each criteria}}
+                                            {{this.[0]}} <br> <input type="range" min="0" max="{{divide ../pointsPossible ../criteria.length}}" step="1" value="{{this.[1]}}" class="slider" list="tickmarks" name="sliderScore[]"> <br>
+                                            Current Score: {{this.[1]}} <br> <br>
+                                        {{/each}}
                                     {{/if}}
                                     <input type="number" name="pointsEarned[]" value="{{pointsEarned}}">/{{pointsPossible}}<br>
                             {{/each}}
@@ -39,7 +45,13 @@
                                 <h4>{{title}}</h4>
                                 {{#if description}}
                                     {{description}}<br>
-                                {{/if}}
+                                {{/if}} <br>
+                                {{#if criteria}}
+                                    {{#each criteria}}
+                                        {{this.[0]}} <br> <input type="range" min="0" max="{{divide ../pointsPossible ../criteria.length}}" step="1" value="{{this.[1]}}" class="slider" list="tickmarks" name="sliderScore[]"> <br>
+                                        Current Score: {{this.[1]}} <br> <br>
+                                    {{/each}}
+                                {{/if}} <br>
                                 {{#if ../student}}
                                     <input type="number" name="pointsEarned[]" placeholder="0">/{{pointsPossible}}<br>
                                 {{else}}
