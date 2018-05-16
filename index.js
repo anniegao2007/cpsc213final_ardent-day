@@ -789,14 +789,16 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId', (
             Students.findOne({_id: stud}, (err, student) => {
                 Rubrics.findOne({studentId: stud, masterId: RID}, (err, studentRubric) => {
                     let currentTotal = 0;
+                    let grandTotalPts = 0;
                     if(studentRubric) {
                         for(var i = 0; i < studentRubric.fields.length; i++) {
                             for(var j = 0; j < studentRubric.fields[i].criteria.length; j++) {
                                 currentTotal += parseInt(studentRubric.fields[i].criteria[j][1]);
                             }
+                            grandTotalPts += studentRubric.fields[i].pointsPossible;
                         }
                     }
-                    res.render('fillOut', {rubric, students, classId: CID, sectionId: SID, rubricId: RID, student, studentRubric, currentTotal});
+                    res.render('fillOut', {rubric, students, classId: CID, sectionId: SID, rubricId: RID, student, studentRubric, currentTotal, grandTotalPts});
                 });
             });
         });
