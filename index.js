@@ -904,6 +904,7 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res
                 let sketchyFieldsPlaceholder = [];
                 let totalFieldPts = [];
                 let pointsPossible = 0;
+                let ungradedStudents = [];
                 for(var i = 0; i < students.length; i++) {
                     for(var j = 0; j < rubrics.length; j++) {
                         if(students[i]._id == rubrics[j].studentId) {
@@ -932,6 +933,8 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res
                                                     fieldScores: fieldScores, 
                                                     comments: rubrics[j].comments});
                             break;
+                        } else if(j == rubrics.length-1) {
+                            ungradedStudents.push(students[i]);
                         }
                     }
                 }
@@ -967,10 +970,10 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res
                      let graphOptions = {layout: layout, filename: "basic-histogram", fileopt: "overwrite"};
                      plotly.plot(histogramData, graphOptions, function(err, msg) {
                         //console.log(msg);
-                        res.render('grades', { classId: req.params.classId, sectId: req.params.sectId, sketchyFieldsPlaceholder, joinStudentsRubrics, statistics });
+                        res.render('grades', { classId: req.params.classId, sectId: req.params.sectId, sketchyFieldsPlaceholder, joinStudentsRubrics, statistics, ungradedStudents });
                      });
                 } else {
-                    res.render('grades', { classId: req.params.classId, sectId: req.params.sectId, sketchyFieldsPlaceholder, joinStudentsRubrics, statistics });
+                    res.render('grades', { classId: req.params.classId, sectId: req.params.sectId, sketchyFieldsPlaceholder, joinStudentsRubrics, statistics, ungradedStudents });
                 }
             });
         });

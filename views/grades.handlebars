@@ -30,6 +30,20 @@
     {{/if}}
 </table>
 <br>
+{{#if ungradedStudents}}
+    <h2>Ungraded Students</h2>
+    <table id="ungraded">
+        <thead>
+            <th>Name</th>
+        </thead>
+        {{#each ungradedStudents}}
+            <tr class="ungradedStudent">
+                <td>{{lastname}}, {{firstname}}</td>
+            </tr>
+        {{/each}}
+    </table>
+{{/if}}
+<br>
 <h2>Assignment Overall Statistics</h2>
     {{#if statistics}}
         <p>Median: {{statistics.median}}</p>
