@@ -793,12 +793,12 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId', (
                     if(studentRubric) {
                         for(var i = 0; i < studentRubric.fields.length; i++) {
                             for(var j = 0; j < studentRubric.fields[i].criteria.length; j++) {
-                                currentTotal += parseInt(studentRubric.fields[i].criteria[j][1]);
+                                currentTotal += parseFloat(studentRubric.fields[i].criteria[j][1]);
                             }
                             grandTotalPts += studentRubric.fields[i].pointsPossible;
                         }
                     }
-                    res.render('fillOut', {rubric, students, classId: CID, sectionId: SID, rubricId: RID, student, studentRubric, currentTotal, grandTotalPts});
+                    res.render('fillOut', {rubric, students, classId: CID, sectionId: SID, rubricId: RID, student, studentRubric, currentTotal: currentTotal.toFixed(2), grandTotalPts: grandTotalPts.toFixed(2)});
                 });
             });
         });
@@ -827,14 +827,14 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
             for(var i = 0; i < studentRubric.fields.length; i++){
                 let totalPts = 0;
                 for(var j = 0; j < studentRubric.fields[i].criteria.length; j++) {
+                    // console.log(`slider at ${slider[sliderCounter]}`);
                     studentRubric.fields[i].criteria[j][1] = slider[sliderCounter];
-                    totalPts += parseInt(slider[sliderCounter]);
-                    // console.log(`slider[sliderCounter] = ${slider[sliderCounter]}`);
+                    totalPts += parseFloat(slider[sliderCounter]);
                     sliderCounter++;
                 }
                 almostFinalScore += totalPts;
                 // studentRubric.fields[i].pointsEarned = points[i];
-                studentRubric.fields[i].pointsEarned = totalPts;
+                studentRubric.fields[i].pointsEarned = +totalPts.toFixed(2);
             }
             if(finalScore === "") {
                 finalScore = almostFinalScore;
@@ -862,14 +862,14 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
                     let totalPts = 0;
                     for(var j = 0; j < rubric.fields[i].criteria.length; j++) {
                         rubric.fields[i].criteria[j][1] = slider[sliderCounter];
-                        totalPts += parseInt(slider[sliderCounter]);
+                        totalPts += parseFloat(slider[sliderCounter]);
                         // console.log(`slider[sliderCounter] = ${slider[sliderCounter]}`);
                         sliderCounter++;
                     }
                     almostFinalScore += totalPts;
                     newRubric.fields.push({title: rubric.fields[i].title,
                         pointsPossible: rubric.fields[i].pointsPossible,
-                        pointsEarned: totalPts,
+                        pointsEarned: +totalPts.toFixed(2),
                         description: rubric.fields[i].description,
                         criteria: rubric.fields[i].criteria,
                     });

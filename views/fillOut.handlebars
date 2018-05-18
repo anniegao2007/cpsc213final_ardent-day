@@ -35,7 +35,7 @@
                                     {{#if criteria}}
                                         {{#each criteria}}
                                             {{this.[0]}} - Current Score: {{this.[1]}} <br>
-                                            <br> <input type="range" min="0" max="{{divide ../pointsPossible ../criteria.length}}" step="1" value="{{this.[1]}}" class="slider" list="tickmarks" name="sliderScore[]"> <br>
+                                            <br> <input type="range" min="0" max="{{divide ../pointsPossible ../criteria.length}}" step="0.1" value="{{this.[1]}}" class="slider" list="tickmarks" name="sliderScore[]"> <br>
                                         {{/each}}
                                     {{/if}}
                                     Field Score: {{pointsEarned}} / {{pointsPossible}}<br> <br>
