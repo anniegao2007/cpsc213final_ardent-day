@@ -41,7 +41,7 @@
                                     Field Score: {{pointsEarned}} / {{pointsPossible}}<br> <br>
                             {{/each}}
                             <h4>Current Grade: {{currentTotal}} / {{grandTotalPts}}</h4>
-                            <h4>Final Grade: </h4> <input type="number" name="finalScore" placeholder="{{currentTotal}}" value="{{studentRubric.finalScore}}"> / {{grandTotalPts}} <br>
+                            <h4>Final Grade: </h4> <input type="number" step="any" name="finalScore" placeholder="{{currentTotal}}" value="{{studentRubric.finalScore}}"> / {{grandTotalPts}} <br>
                         {{else}}
                             {{#each rubric.fields}}
                                 <h4>{{title}}</h4>
@@ -51,7 +51,7 @@
                                 {{#if criteria}}
                                     {{#each criteria}}
                                         {{this.[0]}} - Current Score: {{this.[1]}} <br>
-                                        <br> <input type="range" min="0" max="{{divide ../pointsPossible ../criteria.length}}" step="1" value="{{this.[1]}}" class="slider" list="tickmarks" name="sliderScore[]"> <br>
+                                        <br> <input type="range" min="0" max="{{divide ../pointsPossible ../criteria.length}}" step="0.1" value="{{this.[1]}}" class="slider" list="tickmarks" name="sliderScore[]"> <br>
                                     {{/each}}
                                 {{/if}} <br>
                                 <!--{{#if ../student}}
@@ -61,7 +61,7 @@
                                 <!--{{/if}}-->
                             {{/each}}
                         <h4>Current Grade: {{currentTotal}}</h4>
-                        <h4>Final Grade: </h4> <input type="number" name="finalScore" placeholder="{{currentTotal}}" value="{{studentRubric.finalScore}}"> <br> 
+                        <h4>Final Grade: </h4> <input type="number" step="any" name="finalScore" placeholder="{{currentTotal}}" value="{{studentRubric.finalScore}}"> <br> 
                         {{/if}}
                         <br>
                         <h4>Additional Comments</h4>

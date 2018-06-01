@@ -378,18 +378,16 @@ app.post('/class/:classId/section/:sectionId/student/create', (req, res) => {
     const lName = req.body.lastname;
     const id = req.body.studentid;
     const email = req.body.studentemail;
-    Students.findOne({ studentid: id }, (err1, stu) => {
-        if(stu) {
-            if(stu.sections.indexOf(sectId) != -1){
-                errors.push('Student already exists.');
-                res.redirect(`/class/${cId}/section/${sectId}/student`);
-            }
-            else{
+    Students.findOne({ studentid: id, firstname: fName, lastname: lName }, (err1, stu) => {
+        if(stu && stu.sections.indexOf(sectId) != -1) {
+            errors.push('Student already exists.');
+            res.redirect(`/class/${cId}/section/${sectId}/student`);
+            /* else{
                 stu.sections.push(sectId);
                 Students.update({studentid: id}, {$set: {sections: stu.sections}}, ()=>{
                     res.redirect(`/class/${cId}/section/${sectId}/student`);
                 });
-            }
+            } */
         } else if(fName.length == 0 || lName.length == 0 || email.length == 0) {
             errors.push('Please fill out all fields.');
             res.redirect(`/class/${cId}/section/${sectId}/student`);
@@ -414,7 +412,7 @@ app.post('/class/:classId/section/:sectionId/student/create', (req, res) => {
 // Edit a student's data
 app.get('/class/:classId/section/:sectionId/student/:studentId/edit', (req, res) => {
     const id = req.params.studentId;
-    Students.findOne({ studentid: id }, (err, stu) => {
+    Students.findOne({ _id: id }, (err, stu) => {
         res.render('editing', { student: stu, classID: req.params.classId, sectionID: req.params.sectionId });
     });
 });
@@ -426,7 +424,7 @@ app.post('/class/:classId/section/:sectionId/student/:studentId/edit', (req, res
     const id = req.body.studentid;
     const email = req.body.studentemail;
 
-    Students.update({ studentid: req.params.studentId }, { $set: { firstname: fName, lastname: lName, studentid: id, email: email }}, () => {
+    Students.update({ _id: req.params.studentId }, { $set: { firstname: fName, lastname: lName, studentid: id, email: email }}, () => {
         res.redirect(`/class/${req.params.classId}/section/${req.params.sectionId}/student`);
     });
 });
@@ -436,18 +434,18 @@ app.get('/class/:classId/section/:sectionId/student/:studentId/delete', (req, re
     const sectId = req.params.sectionId;
     const cId = req.params.classId;
     const studentId = req.params.studentId;
-    Students.findOne({ studentid: studentId }, (err1, student) => {
+    Students.findOne({ _id: studentId }, (err1, student) => {
         var i = student.sections.indexOf(sectId);
         if(i > -1){
             student.sections.splice(i, 1);
         }
         if(student.sections.length === 0){
-            Students.remove({studentid: studentId}, () => {
+            Students.remove({_id: studentId}, () => {
                 res.redirect(`/class/${cId}/section/${sectId}/student`);
             });
         }
         else{
-            Students.update({studentid: studentId}, {$set: {sections: student.sections}}, () => {
+            Students.update({_id: studentId}, {$set: {sections: student.sections}}, () => {
                 res.redirect(`/class/${cId}/section/${sectId}/student`);
             });
         }
@@ -814,7 +812,7 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
     var studId = req.params.studentId;
     var cmnts = req.body.comments;
     var slider = req.body.sliderScore;
-    var finalScore = req.body.finalScore;
+    var finalScore = parseFloat(req.body.finalScore);
     /*for(var i = 0; i < points.length; i++){
         if(points[i] === ""){
             points[i] = 0;
@@ -839,7 +837,7 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
             if(finalScore === "") {
                 finalScore = almostFinalScore;
             }
-            Rubrics.update({studentId: studId, masterId: RID}, {$set: {fields: studentRubric.fields, comments: cmnts, finalScore}}, () => {
+            Rubrics.update({studentId: studId, masterId: RID}, {$set: {fields: studentRubric.fields, comments: cmnts, finalScore: +finalScore.toFixed(2)}}, () => {
                 res.redirect(`/class/${CID}/section/${SID}/rubric/${RID}/fillOut`);
             });
         }
@@ -928,7 +926,7 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res
                             totalFieldPts.push(rubrics[j].finalScore);
                             joinStudentsRubrics.push({stu: students[i],
                                                     finalScore: rubrics[j].finalScore, 
-                                                    pointsEarnedTotal: pointsEarnedTotal, 
+                                                    pointsEarnedTotal: +pointsEarnedTotal.toFixed(2), 
                                                     pointsPossible: pointsPossible, 
                                                     fieldScores: fieldScores, 
                                                     comments: rubrics[j].comments});

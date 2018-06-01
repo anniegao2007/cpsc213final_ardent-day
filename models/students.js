@@ -13,7 +13,6 @@ const StudentSchema = new Schema({
         lowercase: true,
     },
     sections: [String], //sectionids
-    classes: [String],
 });
 
 module.exports = mongoose.model('Students', StudentSchema);
