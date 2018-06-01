@@ -834,7 +834,7 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
                 // studentRubric.fields[i].pointsEarned = points[i];
                 studentRubric.fields[i].pointsEarned = +totalPts.toFixed(2);
             }
-            if(finalScore === "") {
+            if(isNaN(finalScore)) {
                 finalScore = almostFinalScore;
             }
             Rubrics.update({studentId: studId, masterId: RID}, {$set: {fields: studentRubric.fields, comments: cmnts, finalScore: +finalScore.toFixed(2)}}, () => {
@@ -851,7 +851,7 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
                     assignmentTitle: rubric.assignmentTitle,
                     isMaster: false,
                     masterId: RID,
-                    finalScore: finalScore,
+                    //finalScore: finalScore,
                 });
                 newRubric.sectionId.push(SID);
                 let sliderCounter = 0;
@@ -872,8 +872,8 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
                         criteria: rubric.fields[i].criteria,
                     });
                 }
-                if(finalScore === "") {
-                    newRubric.finalScore = almostFinalScore;
+                if(isNaN(finalScore)) {
+                    newRubric.finalScore = +almostFinalScore.toFixed(2);
                 }
                 newRubric.save(() => {
                     console.log(`Saved ${newRubric}`);
