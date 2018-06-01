@@ -505,6 +505,7 @@ app.post('/class/:classId/section/:sectId/rubric/create', (req, res) => {
         });
         if(radio === "thisSection") {
             newRubric.sectionId.push(sectId);
+            let totalPts = 0;
             for(var i = 0; i < fieldNames.length; i++){
                 let criteriaStrings = fieldCriteria[i].trim().split(',');
                 //console.log(criteriaStrings);
@@ -512,8 +513,10 @@ app.post('/class/:classId/section/:sectId/rubric/create', (req, res) => {
                 for(var j = 0; j < criteriaStrings.length; j++) {
                     criteria.push([criteriaStrings[j], 0 ]);
                 }
+                totalPts += parseInt(fieldValues[i]);
                 newRubric.fields.push({title: fieldNames[i], pointsPossible: fieldValues[i], description: fieldDescriptions[i], criteria});
             }
+            newRubric.totalPts = totalPts;
             newRubric.save(() => {
                 console.log(`Saved ${newRubric}`);
                 fieldData = [""];
@@ -524,6 +527,7 @@ app.post('/class/:classId/section/:sectId/rubric/create', (req, res) => {
                 for(var i = 0; i < sects.length; i++) {
                     newRubric.sectionId.push(sects[i]._id);
                 }
+                let totalPts = 0;
                 for(var i = 0; i < fieldNames.length; i++){
                     let criteriaStrings = fieldCriteria[i].trim().split(',');
                     //console.log(criteriaStrings);
@@ -531,8 +535,10 @@ app.post('/class/:classId/section/:sectId/rubric/create', (req, res) => {
                     for(var j = 0; j < criteriaStrings.length; j++) {
                         criteria.push([criteriaStrings[j], 0 ]);
                     }
+                    totalPts += parseInt(fieldValues[i]);
                     newRubric.fields.push({title: fieldNames[i], pointsPossible: fieldValues[i], description: fieldDescriptions[i], criteria});
                 }
+                newRubric.totalPts = totalPts;
                 newRubric.save(() => {
                     console.log(`Saved ${newRubric}`);
                     fieldData = [""];
@@ -575,6 +581,7 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/clone', (req, res) => 
             assignmentDate: r.assignmentDate,
             assignmentTitle: `${r.assignmentTitle} Clone`,
             fields: r.fields,
+            totalPts: r.totalPts,
         });
         newRubric.save(() => {
             console.log(`Saved: ${newRubric}`);
@@ -733,15 +740,17 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/edit', (req, res) => 
     if(errors.length === 0){
         Rubrics.findOne({ _id: req.params.rubricId, isMaster: true }, (err, rubric) => {
             editFieldData = [];
+            let totalPts = 0;
             for(var i = 0; i < fieldNames.length; i++){
                 let criteriaStrings = fieldCriteria[i].trim().split(',');
-            let criteria = [];
-            for(var j = 0; j < criteriaStrings.length; j++) {
-                criteria.push([criteriaStrings[j], 0 ]);
-            }
+                let criteria = [];
+                totalPts += parseInt(fieldValues[i]);
+                for(var j = 0; j < criteriaStrings.length; j++) {
+                    criteria.push([criteriaStrings[j], 0 ]);
+                }
                 editFieldData.push({title: fieldNames[i], description: fieldDescriptions[i], pointsPossible: fieldValues[i], criteria});
             }
-            Rubrics.update({ _id: req.params.rubricId }, { $set: { assignmentDate: date, assignmentTitle: title, fields: editFieldData }}, () => {
+            Rubrics.update({ _id: req.params.rubricId }, { $set: { assignmentDate: date, assignmentTitle: title, fields: editFieldData, totalPts }}, () => {
                 Rubrics.remove({masterId: req.params.rubricId}, () =>{
                     editFieldData = [];
                     res.redirect(`/class/${req.params.classId}/section/${req.params.sectId}/rubric`);
@@ -787,16 +796,16 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId', (
             Students.findOne({_id: stud}, (err, student) => {
                 Rubrics.findOne({studentId: stud, masterId: RID}, (err, studentRubric) => {
                     let currentTotal = 0;
-                    let grandTotalPts = 0;
+                    //let grandTotalPts = 0;
                     if(studentRubric) {
                         for(var i = 0; i < studentRubric.fields.length; i++) {
                             for(var j = 0; j < studentRubric.fields[i].criteria.length; j++) {
                                 currentTotal += parseFloat(studentRubric.fields[i].criteria[j][1]);
                             }
-                            grandTotalPts += studentRubric.fields[i].pointsPossible;
+                            //grandTotalPts += studentRubric.fields[i].pointsPossible;
                         }
                     }
-                    res.render('fillOut', {rubric, students, classId: CID, sectionId: SID, rubricId: RID, student, studentRubric, currentTotal: currentTotal.toFixed(2), grandTotalPts: grandTotalPts.toFixed(2)});
+                res.render('fillOut', {rubric, students, classId: CID, sectionId: SID, rubricId: RID, student, studentRubric, currentTotal: currentTotal.toFixed(2), /*grandTotalPts: grandTotalPts.toFixed(2)*/});
                 });
             });
         });
@@ -851,6 +860,7 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
                     assignmentTitle: rubric.assignmentTitle,
                     isMaster: false,
                     masterId: RID,
+                    totalPts: rubric.totalPts,
                     //finalScore: finalScore,
                 });
                 newRubric.sectionId.push(SID);
@@ -887,6 +897,7 @@ app.post('/class/:classId/section/:sectId/rubric/:rubricId/fillOut/:studentId/su
 // Display list of students with their scores
 app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res) => {
     Rubrics.findOne({ _id: req.params.rubricId, isMaster: true }, (err, r) => {
+        let pointsPossible = r.totalPts;
         Students.find({ sections: req.params.sectId }, (err1, students) => {
             students.sort(function(a, b) {
                 if(a.lastname < b.lastname) {
@@ -901,12 +912,12 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res
                 let joinStudentsRubrics = []; //student, totalScore, scores for each field, comments
                 let sketchyFieldsPlaceholder = [];
                 let totalFieldPts = [];
-                let pointsPossible = 0;
+                //let pointsPossible = 0;
                 let ungradedStudents = [];
                 for(var i = 0; i < students.length; i++) {
                     for(var j = 0; j < rubrics.length; j++) {
                         if(students[i]._id == rubrics[j].studentId) {
-                            pointsPossible = 0;
+                            //pointsPossible = 0;
                             let pointsEarnedTotal = 0;
                             let fieldScores = [];
                             //let totalFieldPts = [];
@@ -918,7 +929,7 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res
                                 let tmpTotal = rubrics[j].fields[k].pointsPossible;
                                 let tmpEarned = rubrics[j].fields[k].pointsEarned;
                                 // individualFieldPts.push({ pts: rubrics[j].fields[k].pointsEarned });
-                                pointsPossible += tmpTotal;
+                                //pointsPossible += tmpTotal;
                                 pointsEarnedTotal += tmpEarned;
                                 fieldScores.push({tmpEarned: tmpEarned, tmpTotal: tmpTotal});
                             }
@@ -974,6 +985,26 @@ app.get('/class/:classId/section/:sectId/rubric/:rubricId/viewScores', (req, res
                     res.render('grades', { classId: req.params.classId, sectId: req.params.sectId, sketchyFieldsPlaceholder, joinStudentsRubrics, statistics, ungradedStudents });
                 }
             });
+        });
+    });
+});
+
+app.get("/class/:classId/section/:sectId/student/:stuId/records", (req, res) => {
+    const classId = req.params.classId;
+    const sectId = req.params.sectId;
+    const stuId = req.params.stuId;
+    Students.findOne({ _id: stuId }, (err, stu) => {
+        Rubrics.find({ sectionId: sectId, studentId: stuId }, (err1, rubrics) => {
+            rubrics.sort(function(a, b) {
+                if(a.assignmentDate < b.assignmentDate) {
+                    return -1;
+                } else if(a.assignmentDate > b.assignmentDate) {
+                    return 1;
+                } else {
+                    return 0;
+                }
+            });
+            res.render('studentRecord', { student: stu, rubrics, classId });
         });
     });
 });

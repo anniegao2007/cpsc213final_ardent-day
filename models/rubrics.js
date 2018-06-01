@@ -25,6 +25,7 @@ const RubricSchema = new Schema({
     fields: [Field],
     comments: String,
     finalScore: Number,
+    totalPts: Number,
 });
 
 module.exports = mongoose.model('Rubrics', RubricSchema);

@@ -18,7 +18,7 @@
     {{#if joinStudentsRubrics}}
         {{#each joinStudentsRubrics}}
             <tr class="studentData">
-                <td>{{stu.lastname}}, {{stu.firstname}}</td>
+                <td><a href="/class/{{../classId}}/section/{{../sectId}}/student/{{stu._id}}/records">{{stu.lastname}}, {{stu.firstname}}</a></td>
                 <td>{{finalScore}} / {{pointsPossible}}</td>
                 <td>{{pointsEarnedTotal}} / {{pointsPossible}}</td>
                 {{#each fieldScores}}

@@ -1,0 +1,24 @@
+<link href="/static/main.css" rel="stylesheet">
+
+<div style="padding-left:20px">
+<h1>Assignment Records for {{student.lastname}}, {{student.firstname}}</h1>
+<h3><a href="/">Classes</a> > <a href="/class/{{classId}}/section">Sections</a> > Student</h3>
+<table id="records">
+    <thead>
+        <th>Assignment Date</th>
+        <th>Assignment Name</th>
+        <th>Final Score</th>
+        <th>Comments</th>
+    </thead>
+    {{#if rubrics}}
+        {{#each rubrics}}
+            <tr class="record">
+                <td>{{assignmentDate}}</td>
+                <td>{{assignmentTitle}}</td>
+                <td>{{finalScore}}/{{totalPts}}</td>
+                <td>{{comments}}</td>
+            </tr>
+        {{/each}}
+    {{else}}
+        <h4>This student has no assignment records in this section.</h4>
+    {{/if}}

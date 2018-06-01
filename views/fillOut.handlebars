@@ -40,8 +40,8 @@
                                     {{/if}}
                                     Field Score: {{pointsEarned}} / {{pointsPossible}}<br> <br>
                             {{/each}}
-                            <h4>Current Grade: {{currentTotal}} / {{grandTotalPts}}</h4>
-                            <h4>Final Grade: </h4> <input type="number" step="any" name="finalScore" placeholder="{{currentTotal}}" value="{{studentRubric.finalScore}}"> / {{grandTotalPts}} <br>
+                            <h4>Current Grade: {{currentTotal}} / {{studentRubric.totalPts}}</h4>
+                            <h4>Final Grade: </h4> <input type="number" step="any" name="finalScore" placeholder="{{currentTotal}}" value="{{studentRubric.finalScore}}"> / {{studentRubric.totalPts}} <br>
                         {{else}}
                             {{#each rubric.fields}}
                                 <h4>{{title}}</h4>
