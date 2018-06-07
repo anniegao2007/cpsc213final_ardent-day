@@ -1,3 +1,4 @@
 # cpsc213final_ardent-day
+Grading app for teachers to create and score rubrics in real time, then collect and analyze class and individual student data.
 
-MONGO_URL='mongodb://ardent:day@ds143245.mlab.com:43245/cpsc213-final'
+https://www.gradr-213.herokuapp.com
